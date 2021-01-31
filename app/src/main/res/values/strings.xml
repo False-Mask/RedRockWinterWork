@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">NeteaseCloudMusic</string>
+    <string name="default_name">无名</string>
+    <string name="default_focus_count">关注   0</string>
+    <string name="default_fan_count">粉丝   0</string>
+    <string name="default_favorite_text_context">我喜欢的音乐~</string>
+    <string name="default_song_list_title">我的歌单</string>
 </resources>

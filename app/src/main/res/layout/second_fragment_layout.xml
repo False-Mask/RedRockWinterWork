@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <!--            左右3个dp为了让边框的阴影效果显示出来-->
+        <LinearLayout
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:id="@+id/linear_second_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="70dp"
+            android:background="@drawable/view_shap_1"
+            android:elevation="4dp">
+
+            <ImageView
+                android:paddingLeft="10dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:src="@drawable/head_show" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="无名"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+
+        <!--            左右3个dp为了让边框的阴影效果显示出来-->
+        <LinearLayout
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_width="match_parent"
+            android:id="@+id/list_number"
+            android:layout_height="30dp"
+            android:layout_below="@id/linear_second_fragment"
+            android:orientation="horizontal"
+            android:background="@drawable/view_shap_2"
+            android:elevation="4dp">
+            <TextView
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/black"
+                android:text="关注   0"
+                />
+            <View
+                android:layout_marginLeft="15dp"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/black"/>
+            <TextView
+                android:id="@+id/fan_count"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/black"
+                android:text="@string/default_fan_count"
+                android:layout_marginLeft="15dp"/>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:background="@color/black"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginRight="3dp"
+            android:layout_marginLeft="3dp"
+            android:background="@drawable/view_shap_3"
+            android:elevation="4dp"
+            android:layout_width="match_parent"
+            android:id="@+id/favorite"
+            android:layout_height="60dp"
+            android:layout_below="@+id/list_number"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_margin="5dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/favorite_icon"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/default_favorite_text_context"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/song_list_title"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@id/favorite"
+            android:layout_marginTop="10dp"
+            android:textSize="30dp"
+            android:textColor="@color/black"
+            android:text="@string/default_song_list_title"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_song_list"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/song_list_title"/>
+    </RelativeLayout>
+
+</ScrollView>
