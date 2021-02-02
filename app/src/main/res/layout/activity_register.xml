@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".register.RegisterActivity">
+    <TextView
+        android:id="@+id/register_title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:text="@string/register_title"
+        android:textColor="@color/black"
+        android:textSize="30dp" />
+
+    <ImageView
+        android:id="@+id/back_image_register"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_margin="10dp"
+        android:src="@drawable/back_icon" />
+
+    <RelativeLayout
+        android:id="@+id/register_relative"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/back_image_register"
+        android:layout_marginTop="200dp"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/nickname"
+            android:hint="@string/hint_nickname"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="3dp"
+            android:inputType="number"
+            android:background="@drawable/view_shap_3"
+            />
+
+        <EditText
+            android:id="@+id/phone"
+            android:hint="@string/hint_phone"
+            android:layout_below="@id/nickname"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="3dp"
+            android:inputType="number"
+            android:background="@drawable/view_shap_3"/>
+        <EditText
+            android:id="@+id/password"
+            android:hint="@string/hint_password"
+            android:layout_below="@+id/phone"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"
+            android:inputType="number"
+            android:background="@drawable/view_shap_3"
+            />
+        <EditText
+            android:id="@+id/captcha"
+            android:hint="@string/hint_captcha"
+            android:layout_below="@+id/password"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="10dp"
+            android:inputType="number"
+            android:background="@drawable/view_shap_3"
+            />
+
+        <Button
+            android:id="@+id/send_captcha_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:layout_alignTop="@id/captcha"
+            android:layout_toRightOf="@id/captcha"
+            android:background="@drawable/send_captcha_button_selector"
+            android:hint="@string/button_send_captcha" />
+    </RelativeLayout>
+    <Button
+        android:id="@+id/register_button"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@id/register_relative"
+        android:text="@string/register_button"
+        android:background="@drawable/register_button_selector"/>
+
+</RelativeLayout>

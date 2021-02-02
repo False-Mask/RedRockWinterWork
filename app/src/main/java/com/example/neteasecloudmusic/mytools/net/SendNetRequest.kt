@@ -37,6 +37,11 @@ class SendNetRequest{
             writer.write(tail)
             writer.flush()
             getResult(httpURLConnection,back)
+
+            //关闭
+            httpURLConnection.disconnect()
+            outputStream.close()
+            writer.close()
         }.start()
 
     }
@@ -56,6 +61,10 @@ class SendNetRequest{
             }
             back.onResponded(stringBuilder.toString())
             Log.d(TAG, "网络请求成功")
+
+            //关闭流
+            inputStream.close()
+
         }else {
             back.onFailed(connection.responseCode)
             Log.d(TAG, "网络请求失败")
@@ -79,6 +88,10 @@ class SendNetRequest{
             connection.requestMethod="GET"
 
             getResult(connection,back)
+
+            //关闭连接
+            connection.disconnect()
+
         }.start()
 
     }

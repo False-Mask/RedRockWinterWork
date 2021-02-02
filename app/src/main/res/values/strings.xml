@@ -5,4 +5,27 @@
     <string name="default_fan_count">粉丝   0</string>
     <string name="default_favorite_text_context">我喜欢的音乐~</string>
     <string name="default_song_list_title">我的歌单</string>
+    <string name="default_login_title">登陆</string>
+    <string name="default_login_button_1">手机号登陆</string>
+    <string name="default_login_button_2">网抑云账号登陆</string>
+
+    <string name="defalut_login_by_phone">手机号登陆</string>
+    <string name="edit_login_hint_1">手机号~</string>
+    <string name="edit_login_hint_2">密码~</string>
+
+    <string name="login_by_phone_button">登陆</string>
+    <string name="register_title">手机号注册</string>
+    <string name="register_button">注册</string>
+    
+    <string name="hint_nickname">名称~</string>
+    <string name="hint_phone">手机号~</string>
+    <string name="hint_password">密码~</string>
+    <string name="hint_captcha">验证码~</string>
+
+    <string name="button_send_captcha">点击发送验证码</string>
+
+    <string name="register_busy">稍等~</string>
+    <string name="register_number_empty">手机号不能为空</string>
+    <string name="register_number_length_wrong">手机号不符合长度要求</string>
+    <string name="send_captcha_successful">发送成功,请留意短信~</string>
 </resources>

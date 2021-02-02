@@ -7,5 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+<!--    底部导航栏的字体颜色-->
     <color name="bottom_text_color">#1296DB</color>
+<!--    按钮没按压的显色-->
+    <color name="button_color_1_false">#5E9BE9</color>
+    <color name="button_color_2_false">#FFFFFF</color>
+<!--    按下以后的显色-->
+    <color name="button_color_1_true">#236fd7</color>
+    <color name="button_color_2_true">#DCDCDC</color>
 </resources>
