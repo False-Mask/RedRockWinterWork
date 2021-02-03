@@ -13,13 +13,13 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".register.RegisterActivity"/>
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".useui.UserUiActivity"></activity>
+        <activity android:name=".register.RegisterActivity" />
         <activity android:name=".loginactivity.LoginByCloudActivity" />
         <activity android:name=".loginactivity.loginbyphone.LoginByPhoneActivity" />
         <activity android:name=".loginactivity.LoginActivity" />
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

@@ -16,7 +16,7 @@
     <string name="login_by_phone_button">登陆</string>
     <string name="register_title">手机号注册</string>
     <string name="register_button">注册</string>
-    
+
     <string name="hint_nickname">名称~</string>
     <string name="hint_phone">手机号~</string>
     <string name="hint_password">密码~</string>

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.ViewDebug
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -58,7 +57,11 @@ class LoginByPhoneActivity : AppCompatActivity() ,ByPhoneContract.ByPhoneIView{
     }
 
     override fun progressOn() {
-        login_progress_bar.visibility=View.VISIBLE
+        login_progress_bar.apply {
+            visibility=View.VISIBLE
+            bringToFront()
+        }
+
         //把控件移到上面 (貌似没起作用)
 //        login_progress_bar.bringToFront()
         window.setFlags( WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)

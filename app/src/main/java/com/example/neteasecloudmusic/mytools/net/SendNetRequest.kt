@@ -1,6 +1,7 @@
 package com.example.neteasecloudmusic.mytools.net
 
 import android.util.Log
+import kotlinx.coroutines.*
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 import java.lang.StringBuilder
@@ -20,29 +21,67 @@ class SendNetRequest{
 
     fun sendPostRequest(url:String, tail:String, back: Back){
 
-        Thread{
-            var httpURLConnection:HttpURLConnection= URL(url).openConnection() as HttpURLConnection
+        GlobalScope.launch {
+            withContext(Dispatchers.IO){
+                var httpURLConnection:HttpURLConnection= URL(url).openConnection() as HttpURLConnection
 
-            httpURLConnection.doInput=true
-            httpURLConnection.doOutput=true
-            httpURLConnection.requestMethod="POST"
-            //httpURLConnection.setRequestProperty("Content-Type", "application/json")
-            httpURLConnection.readTimeout=5000
-            httpURLConnection.connectTimeout=5000
-            httpURLConnection.defaultUseCaches=false
+                Log.d(TAG, "sendPostRequest: $tail")
+                httpURLConnection.apply {
+                    doInput=true
+                    doOutput=true
+                    requestMethod="POST"
+                    readTimeout=5000
+                    connectTimeout=5000
+                    defaultUseCaches=false
+                }
+//                httpURLConnection.doInput=true
+//                httpURLConnection.doOutput=true
+//                httpURLConnection.requestMethod="POST"
+//                //httpURLConnection.setRequestProperty("Content-Type", "application/json")
+//                httpURLConnection.readTimeout=5000
+//                httpURLConnection.connectTimeout=5000
+//                httpURLConnection.defaultUseCaches=false
 
-            var outputStream=httpURLConnection.outputStream
-            var writer=BufferedWriter(OutputStreamWriter(outputStream))
+                var outputStream=httpURLConnection.outputStream
+                var writer=BufferedWriter(OutputStreamWriter(outputStream))
 
-            writer.write(tail)
-            writer.flush()
-            getResult(httpURLConnection,back)
+                writer.write(tail)
+                writer.flush()
+                getResult(httpURLConnection,back)
 
-            //关闭
-            httpURLConnection.disconnect()
-            outputStream.close()
-            writer.close()
-        }.start()
+                //关闭
+                httpURLConnection.disconnect()
+                outputStream.close()
+                writer.close()
+            }
+        }
+
+
+
+
+//        Thread{
+//            var httpURLConnection:HttpURLConnection= URL(url).openConnection() as HttpURLConnection
+//
+//            httpURLConnection.doInput=true
+//            httpURLConnection.doOutput=true
+//            httpURLConnection.requestMethod="POST"
+//            //httpURLConnection.setRequestProperty("Content-Type", "application/json")
+//            httpURLConnection.readTimeout=5000
+//            httpURLConnection.connectTimeout=5000
+//            httpURLConnection.defaultUseCaches=false
+//
+//            var outputStream=httpURLConnection.outputStream
+//            var writer=BufferedWriter(OutputStreamWriter(outputStream))
+//
+//            writer.write(tail)
+//            writer.flush()
+//            getResult(httpURLConnection,back)
+//
+//            //关闭
+//            httpURLConnection.disconnect()
+//            outputStream.close()
+//            writer.close()
+//        }.start()
 
     }
 
@@ -78,22 +117,42 @@ class SendNetRequest{
      */
     fun sendGetRequest(url:String,back: Back){
 
-        Thread{
-            var connection=URL(url).openConnection() as HttpURLConnection
+        GlobalScope.launch {
+            withContext(Dispatchers.IO){
+                var connection=URL(url).openConnection() as HttpURLConnection
 
-            connection.connectTimeout=5000
-            connection.readTimeout=5000
-            connection.defaultUseCaches=false
-            connection.doOutput=true
-            connection.doOutput=true
-            connection.requestMethod="GET"
+                connection.connectTimeout=5000
+                connection.readTimeout=5000
+                connection.defaultUseCaches=false
+                connection.doOutput=true
+                connection.doOutput=true
+                connection.requestMethod="GET"
 
-            getResult(connection,back)
+                getResult(connection,back)
 
-            //关闭连接
-            connection.disconnect()
+                //关闭连接
+                connection.disconnect()
+            }
+        }
 
-        }.start()
+
+
+//        Thread{
+//            var connection=URL(url).openConnection() as HttpURLConnection
+//
+//            connection.connectTimeout=5000
+//            connection.readTimeout=5000
+//            connection.defaultUseCaches=false
+//            connection.doOutput=true
+//            connection.doOutput=true
+//            connection.requestMethod="GET"
+//
+//            getResult(connection,back)
+//
+//            //关闭连接
+//            connection.disconnect()
+//
+//        }.start()
 
     }
 

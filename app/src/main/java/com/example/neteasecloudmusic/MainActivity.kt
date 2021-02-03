@@ -6,23 +6,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
 import com.example.neteasecloudmusic.firstpagefragmentmvp.FirstFragment
+import com.example.neteasecloudmusic.mainactivitymvp.MainActivityPresenter
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView{
     
     var TAG="MainActivity"
+    var presenter=MainActivityPresenter(this)
     //Fragment定义并初始化
     companion object MyFragment{
-        var secondFragment= UserFragment()
-        var firstFragment= FirstFragment()
+        lateinit var secondFragment:UserFragment
+        lateinit var firstFragment:FirstFragment
     }
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //程序开始 初始化View视图
-        initView()
+        initFragment()
     }
 
     fun changeUserIcon(view: View) {
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
                 hideAll(transaction)
                 //替换FrameLayout内容
                 transaction.show(secondFragment)
+                secondFragment.initView()
             }
             //用户点击 “首页”  选项
             R.id.bottom_music,R.id.music_text->{
@@ -58,7 +61,10 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         transaction.commit()
     }
     //初始化
-    override fun initView() {
+    override fun initFragment() {
+        firstFragment=FirstFragment(this)
+        secondFragment=UserFragment(this)
+
         var manager=supportFragmentManager
         var transaction=manager.beginTransaction()
         //添加所有的Fragment
@@ -69,9 +75,12 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         //底部导航栏初始化
         bottom_music.setImageResource(R.drawable.music_icon_2)
         music_text.setTextColor(resources.getColor(R.color.bottom_text_color))
+
         //提交申请
         transaction.commit()
     }
+
+
     //隐藏所有的Fragment
     private fun hideAll(transaction:FragmentTransaction) {
         transaction.hide(firstFragment)

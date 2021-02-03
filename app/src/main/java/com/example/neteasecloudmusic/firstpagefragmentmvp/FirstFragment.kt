@@ -5,11 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.myview.VpAdapter
 import kotlinx.android.synthetic.main.first_fragment_layout.*
 
-class FirstFragment : Fragment() {
+class FirstFragment(mainActivity: MainActivity) : Fragment() {
+    var mcontext=mainActivity
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view=inflater.inflate(R.layout.first_fragment_layout,container,false)
         return view

@@ -23,8 +23,8 @@ class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
         //http请求貌似不太安全(配了啥我也不懂)
         System.setProperty("https.protocols", "TLSv1.2,TLSv1.1,TLSv1,SSLv3")
         var string: String = "/login/cellphone"
-        sendNetRequest.sendPostRequest("$baseUrl$string"
-                , "phone=$phoneNumber&password=$passwordText"
+
+        sendNetRequest.sendGetRequest("$baseUrl$string?phone=$phoneNumber&password=$passwordText"
                 , object : SendNetRequest.Back {
             override fun onResponded(resultBody: String) {
                 Log.d(TAG, "login onResponded: ")
@@ -61,7 +61,7 @@ class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
         var baoyueVersion: Int = 0
         var createTime: Long = 0
         var donateVersion: Int = 0
-        var id: Int = 0
+        var id: Long = 0
         var salt: String = ""
         var status: Int = 0
         var tokenVersion: Int = 0
@@ -86,7 +86,7 @@ class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
             var tokenJsonStr: String = ""
             var type: Int = 0
             var url: String = ""
-            var userId: Int = 0
+            var userId: Long = 0
             override fun toString(): String {
                 return "Binding(bindingTime=$bindingTime, expired=$expired, expiresIn=$expiresIn, id=$id, refreshTime=$refreshTime, tokenJsonStr='$tokenJsonStr', type=$type, url='$url', userId=$userId)"
             }
@@ -126,7 +126,7 @@ class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
         var province: Int = 0
         var remarkName: Any? = null
         var signature: String = ""
-        var userId: Int = 0
+        var userId: Long = 0
         var userType: Int = 0
         var vipType: Int = 0
         override fun toString(): String {
