@@ -6,15 +6,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
 import com.example.neteasecloudmusic.firstpagefragmentmvp.FirstFragment
-import com.example.neteasecloudmusic.userfragmentmvp.SecondFragment
+import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView{
     
     var TAG="MainActivity"
     //Fragment定义并初始化
-    var secondFragment= SecondFragment()
-    var firstFragment= FirstFragment()
+    companion object MyFragment{
+        var secondFragment= UserFragment()
+        var firstFragment= FirstFragment()
+    }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

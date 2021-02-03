@@ -58,6 +58,7 @@ class SendNetRequest{
             var inputStream=connection.inputStream
             inputStream.bufferedReader().forEachLine {
                 stringBuilder.append(it)
+                Log.d(TAG, "getResult: "+it)
             }
             back.onResponded(stringBuilder.toString())
             Log.d(TAG, "网络请求成功")

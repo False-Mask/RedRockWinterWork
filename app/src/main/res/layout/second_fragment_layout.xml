@@ -26,6 +26,7 @@
                 android:src="@drawable/head_show" />
 
             <TextView
+                android:id="@+id/user_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
@@ -111,5 +112,4 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/song_list_title"/>
     </RelativeLayout>
-
 </ScrollView>

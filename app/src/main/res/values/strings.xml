@@ -28,4 +28,8 @@
     <string name="register_number_empty">手机号不能为空</string>
     <string name="register_number_length_wrong">手机号不符合长度要求</string>
     <string name="send_captcha_successful">发送成功,请留意短信~</string>
+
+    <string name="register_clicked_true">正在注册请稍后~</string>
+
+    <string name="register_clicked_false">错误！！</string>
 </resources>

@@ -37,7 +37,7 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginTop="3dp"
-            android:inputType="number"
+            android:inputType="textPersonName"
             android:background="@drawable/view_shap_3"
             />
 
@@ -62,7 +62,7 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginTop="10dp"
-            android:inputType="number"
+            android:inputType="textPassword"
             android:background="@drawable/view_shap_3"
             />
         <EditText
@@ -97,5 +97,11 @@
         android:layout_below="@id/register_relative"
         android:text="@string/register_button"
         android:background="@drawable/register_button_selector"/>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/register_loading"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
 
 </RelativeLayout>

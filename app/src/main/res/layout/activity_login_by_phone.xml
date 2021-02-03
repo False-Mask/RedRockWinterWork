@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".loginactivity.LoginByPhoneActivity">
+    tools:context=".loginactivity.loginbyphone.LoginByPhoneActivity">
 
     <TextView
         android:id="@+id/title"
@@ -43,6 +43,7 @@
             />
 
         <EditText
+            android:id="@+id/edit_phone_2"
             android:hint="@string/edit_login_hint_2"
             android:layout_below="@id/edit_phone_1"
             android:layout_width="match_parent"
@@ -82,4 +83,11 @@
         android:layout_alignRight="@id/login_button"
         android:layout_below="@id/login_button"
         android:text="注册账号"/>
+    <ProgressBar
+        android:id="@+id/login_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
 </RelativeLayout>
