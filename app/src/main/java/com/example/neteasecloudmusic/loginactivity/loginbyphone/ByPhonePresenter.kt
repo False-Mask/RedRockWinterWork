@@ -1,6 +1,7 @@
 package com.example.neteasecloudmusic.loginactivity.loginbyphone
 
 import com.example.neteasecloudmusic.MainActivity
+import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import com.example.neteasecloudmusic.userfragmentmvp.UserPresenter
 import kotlinx.coroutines.*
 
@@ -20,11 +21,11 @@ class ByPhonePresenter (activity:LoginByPhoneActivity): ByPhoneContract.ByPhoneI
                                         ActivityController.Static.finishAll()
 
                                         //登陆逻辑处理完成了 现在就是得告诉 fragment 叫它更新界面
-                                        //头像
-                                        var icon=model.loginResult.profile?.avatarUrl
-                                        //名称
-                                        var name=model.loginResult.profile?.nickname
-                                        UserPresenter(MainActivity.secondFragment).changeIconAndName(icon, name)
+                                        //头像 名称
+                                        model.loginResult.profile?.apply {
+                                                UserPresenter(MainActivity.secondFragment).changeIconAndName(avatarUrl
+                                                ,nickname,phoneNumber,passwordText)
+                                        }
                                 }
                                 //登陆失败
                                 else{

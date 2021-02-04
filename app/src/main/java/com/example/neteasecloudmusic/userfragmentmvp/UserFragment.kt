@@ -15,14 +15,15 @@ import com.example.neteasecloudmusic.loginactivity.LoginActivity
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
 import com.example.neteasecloudmusic.useui.UserUiActivity
 import kotlinx.android.synthetic.main.second_fragment_layout.*
-import java.io.File
 
-class UserFragment(activity:MainActivity) : Fragment() ,UserContract.UserIView{
+class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
     //获取context
-    var mcontext=activity
+    var mcontext=mactivity
     var presenter=UserPresenter(this)
+    var loginPresenter=UserLoginPresenter(this)
+    var activity=mactivity
     //sp数据库实例(方便抓数据)
-    var sp: SharedPreferences? =mcontext?.getSharedPreferences(USER_BASIC_SP_NAME, Context.MODE_PRIVATE)
+    var sp: SharedPreferences? = mcontext.getSharedPreferences(USER_BASIC_SP_NAME, Context.MODE_PRIVATE)
     //sp数据库的名称
     companion object{
         val USER_BASIC_SP_NAME="user_basic_data"
@@ -49,7 +50,7 @@ class UserFragment(activity:MainActivity) : Fragment() ,UserContract.UserIView{
     }
 
     //未登录时候的初始化界面
-    override fun initIconAndName(icon: String?, name: String?) {
+    override fun initIconAndName(icon: String?, name: String?,phoneNumber:String?,password:String?) {
         //更改用户的头像
         Glide.with(this).load(icon).into(user_head_show_icon)
         //更改用户的名称
@@ -61,6 +62,8 @@ class UserFragment(activity:MainActivity) : Fragment() ,UserContract.UserIView{
                 putBoolean("is_login",true)
                 putString("user_name",name)
                 putString("user_icon_url",icon)
+                putString("user_phone_number",phoneNumber)
+                putString("user_password",password)
             }
     }
 
@@ -69,9 +72,22 @@ class UserFragment(activity:MainActivity) : Fragment() ,UserContract.UserIView{
         //Presenter起来干活啦~
             presenter.initView(sp!!)
     }
+
     //改变user的界面
     override fun changeUserTitle(username: String?, userIconUrl: String?) {
         user_name.text=username
         Glide.with(MainActivity.secondFragment).load(userIconUrl).into(user_head_show_icon)
     }
+///////////////////////////////////////////////////////////////////////////////////////
+    fun login() {
+        sp!!.apply {
+         if (getBoolean("is_login",false)){
+             var x =   getString("user_phone_number","NULL")
+             var y =   getString("user_password","NULL")
+             //loginPresenter.loginClicked(x!!,y!!)
+         }
+        }
+    }
+
+
 }

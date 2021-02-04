@@ -4,8 +4,7 @@ import android.content.SharedPreferences
 
 interface UserContract {
     interface UserIView{
-        fun initIconAndName(icon: String?, name: String?)
-
+        fun initIconAndName(icon: String?, name: String?,phoneNumber:String?,password:String?)
         fun changeUserTitle(username: String?, userIconUrl: String?)
         fun initView()
     }

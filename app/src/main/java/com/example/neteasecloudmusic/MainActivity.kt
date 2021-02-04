@@ -1,17 +1,20 @@
 package com.example.neteasecloudmusic
+import android.content.Context
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
-import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
 import com.example.neteasecloudmusic.firstpagefragmentmvp.FirstFragment
+import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityPresenter
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView{
-    
+class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView {
+
     var TAG="MainActivity"
     var presenter=MainActivityPresenter(this)
     //Fragment定义并初始化
@@ -25,6 +28,18 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         setContentView(R.layout.activity_main)
         //程序开始 初始化View视图
         initFragment()
+
+        registerNetListener()
+
+    }
+
+    private fun registerNetListener() {
+        //val intendFilter=IntentFilter()
+        var connectivityManager=getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        var myListener=NetWorkCallback()
+        var request=NetworkRequest.Builder().build()
+        connectivityManager.registerNetworkCallback(request,myListener)
+
     }
 
     fun changeUserIcon(view: View) {
@@ -47,6 +62,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
                 //替换FrameLayout内容
                 transaction.show(secondFragment)
                 secondFragment.initView()
+                secondFragment.login()
             }
             //用户点击 “首页”  选项
             R.id.bottom_music,R.id.music_text->{
@@ -78,6 +94,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
 
         //提交申请
         transaction.commit()
+        window
     }
 
 
@@ -86,4 +103,5 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         transaction.hide(firstFragment)
         transaction.hide(secondFragment)
     }
+
 }
