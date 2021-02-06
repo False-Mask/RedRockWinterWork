@@ -6,10 +6,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.ByPhoneContract
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.ByPhoneModel
+import com.example.neteasecloudmusic.mytools.net.netJob
+import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 
 class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter{
     //供给其他Presenter调用
-
     var USER_BASIC_SP_NAME= UserFragment.USER_BASIC_SP_NAME
     val TAG="UserPresenter"
 

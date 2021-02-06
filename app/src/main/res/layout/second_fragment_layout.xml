@@ -106,7 +106,7 @@
             android:textColor="@color/black"
             android:text="@string/default_song_list_title"/>
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_song_list"
+            android:id="@+id/favorites_list"
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -32,4 +32,6 @@
     <string name="register_clicked_true">正在注册请稍后~</string>
 
     <string name="register_clicked_false">错误！！</string>
+    <string name="favorites_title">标签</string>
+    <string name="favourites_count">0首</string>
 </resources>

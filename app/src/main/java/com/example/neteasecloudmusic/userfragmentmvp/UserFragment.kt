@@ -8,14 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.neteasecloudmusic.MainActivity
+import com.example.neteasecloudmusic.MyApplication
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.loginactivity.LoginActivity
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
+import com.example.neteasecloudmusic.recyclerview.favorites.Favorites
+import com.example.neteasecloudmusic.recyclerview.favorites.RvAdapter
 import com.example.neteasecloudmusic.useui.UserUiActivity
+import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.second_fragment_layout.*
-
+var Mlist:MutableList<Favorites> = mutableListOf()
+var rvAdapter=RvAdapter(Mlist)
 class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
     //获取context
     var mcontext=mactivity
@@ -36,6 +43,9 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
 
     //当view被创建出来的时候
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        //设置adapter
+        favorites_list.adapter= rvAdapter
+        favorites_list.layoutManager=LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
         //用户头像被点击
         user_head_show_icon.setOnClickListener {
            var isLogin= sp?.getBoolean("is_login",false)

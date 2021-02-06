@@ -4,7 +4,8 @@ import android.content.SharedPreferences
 
 interface MainActivityContract {
     interface MainActivityIModel{
-        fun loginAuto()
+        fun  getLoginUrl(): String
+        fun playList(): String
     }
     interface MainActivityIView{
         fun initFragment()

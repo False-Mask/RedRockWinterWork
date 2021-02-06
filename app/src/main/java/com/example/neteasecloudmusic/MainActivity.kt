@@ -11,9 +11,11 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.neteasecloudmusic.firstpagefragmentmvp.FirstFragment
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityPresenter
+import com.example.neteasecloudmusic.mytools.net.netJob
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.user_text as user_text1
 
 class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView
         ,NetWorkChangeImp.NetCallback {
@@ -46,6 +48,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     override fun onDestroy() {
         super.onDestroy()
         connectivityManager.unregisterNetworkCallback(myListener)
+        netJob.cancel()
     }
 
     private fun registerNetListener() {
@@ -58,7 +61,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
 
     fun changeUserIcon(view: View) {
         //初始化颜色
-        user_text.setTextColor(Color.BLACK)
+        user_text1.setTextColor(Color.BLACK)
         music_text.setTextColor(Color.BLACK)
         bottom_user.setImageResource(R.drawable.user_icon_1)
         bottom_music.setImageResource(R.drawable.music_icon_1)
@@ -71,7 +74,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
 
             //用户点击  “用户”  选项
             R.id.user_text,R.id.bottom_user-> {
-                user_text.setTextColor(resources.getColor(R.color.bottom_text_color))
+                user_text1.setTextColor(resources.getColor(R.color.bottom_text_color))
                 bottom_user.setImageResource(R.drawable.user_icon_2)
                 hideAll(transaction)
                 //替换FrameLayout内容
