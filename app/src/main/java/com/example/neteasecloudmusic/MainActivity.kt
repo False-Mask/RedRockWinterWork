@@ -5,17 +5,26 @@ import android.net.ConnectivityManager
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import com.example.neteasecloudmusic.firstpagefragmentmvp.FirstFragment
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityPresenter
+import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView {
+class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView
+        ,NetWorkChangeImp.NetCallback {
+
+    //网络连接管理器
+    private lateinit var connectivityManager:ConnectivityManager
+    //连接变化的实现类
+    private var myListener=NetWorkChangeImp
 
     var TAG="MainActivity"
+
     var presenter=MainActivityPresenter(this)
     //Fragment定义并初始化
     companion object MyFragment{
@@ -28,21 +37,27 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         setContentView(R.layout.activity_main)
         //程序开始 初始化View视图
         initFragment()
-
+        //注册网络连接变化的监听
         registerNetListener()
+        //添加监听器
+        NetWorkChangeImp.addListener(this)
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        connectivityManager.unregisterNetworkCallback(myListener)
     }
 
     private fun registerNetListener() {
         //val intendFilter=IntentFilter()
-        var connectivityManager=getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        var myListener=NetWorkCallback()
+        connectivityManager=getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         var request=NetworkRequest.Builder().build()
         connectivityManager.registerNetworkCallback(request,myListener)
 
     }
 
     fun changeUserIcon(view: View) {
+        //初始化颜色
         user_text.setTextColor(Color.BLACK)
         music_text.setTextColor(Color.BLACK)
         bottom_user.setImageResource(R.drawable.user_icon_1)
@@ -62,7 +77,6 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
                 //替换FrameLayout内容
                 transaction.show(secondFragment)
                 secondFragment.initView()
-                secondFragment.login()
             }
             //用户点击 “首页”  选项
             R.id.bottom_music,R.id.music_text->{
@@ -102,6 +116,16 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     private fun hideAll(transaction:FragmentTransaction) {
         transaction.hide(firstFragment)
         transaction.hide(secondFragment)
+    }
+
+
+    //当有网络的时候自动登陆
+    override fun onAvailable() {
+        presenter.loginAuto()
+    }
+
+    override fun onUnavailable() {
+        MyToast().sendToast(this,"网络出了小问题~",Toast.LENGTH_SHORT)
     }
 
 }

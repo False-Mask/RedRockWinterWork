@@ -7,16 +7,16 @@ import com.google.gson.reflect.TypeToken
 
 class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
 
-    val TAG = "ByPhoneModel"
+    private val TAG = "ByPhoneModel"
 
     //数据对象
     var loginResult = LoginResult()
 
     //主机名 除去了末尾的 "/"
-    val baseUrl = "http://sandyz.ink:3000"
+    private val baseUrl = "http://sandyz.ink:3000"
 
     //网络请求工具类
-    var sendNetRequest = SendNetRequest()
+    private var sendNetRequest = SendNetRequest()
 
     //登陆
     override fun login(phoneNumber: String, passwordText: String): LoginResult {
@@ -73,7 +73,6 @@ class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
         override fun toString(): String {
             return "Account(anonimousUser=$anonimousUser, ban=$ban, baoyueVersion=$baoyueVersion, createTime=$createTime, donateVersion=$donateVersion, id=$id, salt='$salt', status=$status, tokenVersion=$tokenVersion, type=$type, userName='$userName', vipType=$vipType, viptypeVersion=$viptypeVersion, whitelistAuthority=$whitelistAuthority)"
         }
-
     }
 
         class Binding {
@@ -132,8 +131,5 @@ class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
         override fun toString(): String {
             return "Profile(accountStatus=$accountStatus, authStatus=$authStatus, authority=$authority, avatarDetail=$avatarDetail, avatarImgId=$avatarImgId, avatarImgIdStr='$avatarImgIdStr', avatarImgId_str='$avatarImgId_str', avatarUrl='$avatarUrl', backgroundImgId=$backgroundImgId, backgroundImgIdStr='$backgroundImgIdStr', backgroundUrl='$backgroundUrl', birthday=$birthday, city=$city, defaultAvatar=$defaultAvatar, description='$description', detailDescription='$detailDescription', djStatus=$djStatus, eventCount=$eventCount, expertTags=$expertTags, experts=$experts, followed=$followed, followeds=$followeds, follows=$follows, gender=$gender, mutual=$mutual, nickname='$nickname', playlistBeSubscribedCount=$playlistBeSubscribedCount, playlistCount=$playlistCount, province=$province, remarkName=$remarkName, signature='$signature', userId=$userId, userType=$userType, vipType=$vipType)"
         }
-
     }
-
-
 }

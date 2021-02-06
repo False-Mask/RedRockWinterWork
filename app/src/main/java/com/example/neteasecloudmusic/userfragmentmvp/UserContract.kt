@@ -18,4 +18,13 @@ interface UserContract {
 
         fun initView(sp: SharedPreferences)
     }
+
+    interface PlayListIModel{
+
+    }
+
+
+    interface PlayListPresenter{
+
+    }
 }

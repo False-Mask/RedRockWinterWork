@@ -23,6 +23,9 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter{
     //保存用户数据后 用户进行登陆
     override fun initView(sp: SharedPreferences) {
         var isLogin=sp.getBoolean("is_login",false)
+        
+
+
 
         if (isLogin){
             Log.d(TAG, "initView: 读取本地的用户缓存信息")
@@ -32,5 +35,7 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter{
                 view.changeUserTitle(username,userIconUrl)
             }
         }
+        //歌单
+
     }
 }

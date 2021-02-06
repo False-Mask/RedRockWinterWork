@@ -67,7 +67,8 @@ class MyToast {
         }
     }
 
-    //第1个参数是context 2是string
+
+
     fun sendToast(context:Context, string: String, time:Int){
 
         Static.apply {

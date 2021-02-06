@@ -20,7 +20,6 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
     //获取context
     var mcontext=mactivity
     var presenter=UserPresenter(this)
-    var loginPresenter=UserLoginPresenter(this)
     var activity=mactivity
     //sp数据库实例(方便抓数据)
     var sp: SharedPreferences? = mcontext.getSharedPreferences(USER_BASIC_SP_NAME, Context.MODE_PRIVATE)
@@ -37,6 +36,7 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
 
     //当view被创建出来的时候
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        //用户头像被点击
         user_head_show_icon.setOnClickListener {
            var isLogin= sp?.getBoolean("is_login",false)
             if (!isLogin!!){
@@ -56,7 +56,6 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
         //更改用户的名称
         user_name.text=name
         //存入sp数据库
-
         context?.getSharedPreferences(USER_BASIC_SP_NAME,Context.MODE_PRIVATE)
             ?.put {
                 putBoolean("is_login",true)
@@ -70,23 +69,13 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
     //当用户点击了“我的”选项时候对Fragment的界面进行更新
     override fun initView() {
         //Presenter起来干活啦~
-            presenter.initView(sp!!)
+        presenter.initView(sp!!)
     }
 
     //改变user的界面
     override fun changeUserTitle(username: String?, userIconUrl: String?) {
         user_name.text=username
         Glide.with(MainActivity.secondFragment).load(userIconUrl).into(user_head_show_icon)
-    }
-///////////////////////////////////////////////////////////////////////////////////////
-    fun login() {
-        sp!!.apply {
-         if (getBoolean("is_login",false)){
-             var x =   getString("user_phone_number","NULL")
-             var y =   getString("user_password","NULL")
-             //loginPresenter.loginClicked(x!!,y!!)
-         }
-        }
     }
 
 

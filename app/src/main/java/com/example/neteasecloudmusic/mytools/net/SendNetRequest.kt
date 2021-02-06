@@ -7,7 +7,7 @@ import java.io.OutputStreamWriter
 import java.lang.StringBuilder
 import java.net.HttpURLConnection
 import java.net.URL
-
+//发送网络
 class SendNetRequest{
 
     var TAG="SendNetRequest"
