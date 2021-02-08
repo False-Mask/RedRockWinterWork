@@ -12,14 +12,14 @@ import kotlinx.android.synthetic.main.activity_register.*
 class RegisterActivity : AppCompatActivity(),RegisterContract.RegisterIView{
 
 
-    //发送验证码的放回数据
-    lateinit var result:RegisterModel.CaptchaResult
+    //发送验证码的放回数据(虽然好像基本上没怎么用)
+    var result:RegisterModel.CaptchaResult= RegisterModel.CaptchaResult()
     //发送的参数
-    lateinit var phoneNumber:String
-    lateinit var passwordText:String
-    lateinit var nicknameText:String
-    lateinit var captchaNumber:String
-
+    var phoneNumber:String=""
+    var passwordText:String=""
+    var nicknameText:String=""
+    var captchaNumber:String=""
+    //Presenter
     var registerPresenter=RegisterPresenter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +50,6 @@ class RegisterActivity : AppCompatActivity(),RegisterContract.RegisterIView{
 
     }
 
-    override fun waitingForResult() {
-
-    }
-
     override fun sendToast(s: String) {
         MyToast().sendToast(this,s,Toast.LENGTH_SHORT)
     }
@@ -64,6 +60,11 @@ class RegisterActivity : AppCompatActivity(),RegisterContract.RegisterIView{
 
     override fun progressBarOn() {
         register_loading.visibility=View.VISIBLE
+    }
+
+    override fun progressBarOff() {
+        register_loading.visibility=View.GONE
+
     }
 
     override fun changeCaptchaButton() {

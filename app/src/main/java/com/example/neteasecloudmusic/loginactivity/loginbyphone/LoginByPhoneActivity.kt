@@ -25,7 +25,6 @@ class LoginByPhoneActivity : AppCompatActivity() ,ByPhoneContract.ByPhoneIView{
         back_image_phone.setOnClickListener{
             finish()
         }
-
         //注册账号
         register_user_account.setOnClickListener{
             var intent=Intent(this,RegisterActivity::class.java)

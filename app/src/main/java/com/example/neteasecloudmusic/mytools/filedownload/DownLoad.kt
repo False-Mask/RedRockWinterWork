@@ -11,7 +11,7 @@ suspend fun downLoadImage(filename:String,url:String){
     var imageDir=File(imagePath?:"NULL")
     if (!imageDir.exists()) imageDir.mkdirs()
 
-    var imageFile=File("$imageDir$filename")
+    var imageFile=File("$imagePath/$filename.jpg")
     if (!imageFile.exists()) imageFile.createNewFile()
     //从网络上copy文件
     DownLoad.copyFromNet(imageFile,url)
@@ -22,7 +22,7 @@ suspend fun downLoadMusic(filename:String,url:String) {
     var musicDir = File(musicPath?:"NULL")
     if (!musicDir.exists()) musicDir.mkdirs()
 
-    var musicFile = File("$musicPath/$filename")
+    var musicFile = File("$musicPath/$filename.mp4")
     if (!musicFile.exists()) musicFile.createNewFile()
     //copy
     DownLoad.copyFromNet(musicFile, url)
@@ -35,7 +35,11 @@ fun readObjectFile(name: String):Any{
         file.createNewFile()
     }
     var objIn=ObjectInputStream(FileInputStream(file))
-    return objIn.readObject()
+    var obj=objIn.readObject()
+
+    //关闭流
+    objIn.close()
+    return obj
 }
 
 //几个常量
@@ -47,7 +51,7 @@ val musicPath:String?= mContext.filesDir.path+"/music"
 
 //下载序列化文件
 fun downLoadObjectFile(name:String,obj:Any){
-    val file=File(filesPath+name)
+    val file=File("$filesPath/$name")
     if (!file.parentFile.exists()){
         file.parentFile.mkdirs()
     }
@@ -56,10 +60,12 @@ fun downLoadObjectFile(name:String,obj:Any){
     }
     val objOut= ObjectOutputStream(FileOutputStream(file))
     objOut.writeObject(obj)
+
+    //关闭
+    objOut.close()
 }
 
 private object DownLoad{
-
     fun copyFromNet(imageFile: File, url: String) {
 
         //网络连接
@@ -75,5 +81,10 @@ private object DownLoad{
         var bufferedOut=FileOutputStream(imageFile).buffered()
 
         bufferedOut.write(bufferedIn.readBytes())
+
+        //关闭
+        bufferedOut.close()
+        bufferedOut.close()
+        connection.disconnect()
     }
 }

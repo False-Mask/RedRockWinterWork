@@ -1,28 +1,18 @@
 package com.example.neteasecloudmusic.mainactivitymvp
 
 import android.content.Context
-import android.os.Looper
-import android.util.Log
-import android.widget.Toast
+import android.content.SharedPreferences
 import com.example.neteasecloudmusic.MyApplication
-import com.example.neteasecloudmusic.loginactivity.loginbyphone.ByPhoneModel
-import com.example.neteasecloudmusic.mytools.net.*
-import com.example.neteasecloudmusic.mytools.toast.MyToast
-import com.example.neteasecloudmusic.userfragmentmvp.PlayListModel
+import com.example.neteasecloudmusic.loginactivity.loginbyphone.LoginCathe
+import com.example.neteasecloudmusic.loginactivity.loginbyphone.MyLoginCathe
+import com.example.neteasecloudmusic.loginactivity.loginbyphone.loginResult
+import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.lang.Exception
-
-var loginResult = ByPhoneModel.LoginResult()
+var bannerResult=MainActivityModel.Banners()
 var playListResult=MainActivityModel.PlayListResult()
 val spName=UserFragment.USER_BASIC_SP_NAME
-val sp=MyApplication.getContext().getSharedPreferences(spName,Context.MODE_PRIVATE)
-val baseUrl = "http://sandyz.ink:3000"
+val sp: SharedPreferences =MyApplication.getContext().getSharedPreferences(spName,Context.MODE_PRIVATE)
+const val baseUrl = "http://sandyz.ink:3000"
 
 class MainActivityModel : MainActivityContract.MainActivityIModel{
     //数据对象
@@ -36,8 +26,9 @@ class MainActivityModel : MainActivityContract.MainActivityIModel{
         var password:String?=null
         var isLogin=sp.getBoolean("is_login",false)
         if (isLogin){
-            phoneNumber=sp.getString("user_phone_number","NULL")
-            password= sp.getString("user_password","NULL")
+            var mData= readObjectFile(MyLoginCathe) as LoginCathe
+            phoneNumber=mData.phoneNumber
+            password=mData.password
         }
         return "$baseUrl$string?phone=$phoneNumber&password=$password"
     }
@@ -46,8 +37,21 @@ class MainActivityModel : MainActivityContract.MainActivityIModel{
         val playListUrl="/user/playlist?uid="
         return baseUrl+playListUrl+loginResult.account?.id
     }
+//获取banner地址
+    override fun getBanner(): String {
+    //type为1表示获取的是手机的banner
+    /**
+     * 0: pc
 
+        1: android
 
+        2: iphone
+
+        3: ipad
+     */
+        var string="$baseUrl/banner?type=1"
+        return string
+    }
 
 
     class PlayListResult {
@@ -144,5 +148,47 @@ class Creator {
     }
 
 }
+    //Banner数据类
+    data class Banners(
+    var banners: List<Banner> = listOf(),
+    var code: Int = 0
+)
 
-}
+data class Banner(
+    var adDispatchJson: Any? = Any(),
+    var adLocation: Any? = Any(),
+    var adSource: Any? = Any(),
+    var adid: Any? = Any(),
+    var adurlV2: Any? = Any(),
+    var alg: Any? = Any(),
+    var bannerId: String = "",
+    var dynamicVideoData: Any? = Any(),
+    var encodeId: String = "",
+    var event: Any? = Any(),
+    var exclusive: Boolean = false,
+    var extMonitor: Any? = Any(),
+    var extMonitorInfo: Any? = Any(),
+    var monitorBlackList: Any? = Any(),
+    var monitorClick: Any? = Any(),
+    var monitorClickList: List<Any> = listOf(),
+    var monitorImpress: Any? = Any(),
+    var monitorImpressList: List<Any> = listOf(),
+    var monitorType: Any? = Any(),
+    var pic: String = "",
+    var pid: Any? = Any(),
+    var program: Any? = Any(),
+    var requestId: String = "",
+    var scm: String = "",
+    var showAdTag: Boolean = false,
+    var showContext: Any? = Any(),
+    var song: Any? = Any(),
+    var targetId: Int = 0,
+    var targetType: Int = 0,
+    var titleColor: String = "",
+    var typeTitle: String = "",
+    var url: String? = "",
+    var video: Any? = Any()
+)
+
+
+    }

@@ -3,7 +3,7 @@ package com.example.neteasecloudmusic.loginactivity.loginbyphone
 interface ByPhoneContract {
     interface ByPhoneIModel{
         //登陆
-        fun login(phoneNumber: String, passwordText: String): ByPhoneModel.LoginResult
+        fun login(phoneNumber: String, passwordText: String): String
 
     }
 

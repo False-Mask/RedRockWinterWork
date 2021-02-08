@@ -20,13 +20,13 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:text="@string/favorites_title"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:gravity="center_vertical"/>
         <TextView
             android:id="@+id/favorite_item_count"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:textSize="15sp"
+            android:textSize="12sp"
             android:text="@string/favourites_count"
             android:gravity="center_vertical"/>
     </LinearLayout>

@@ -19,7 +19,7 @@ var netJob= Job()
 var netThread= CoroutineScope(netJob)
 
 /**
- * 简化接口(有亿点秒)
+ * 简化接口(有亿点妙)
  */
 suspend fun sendPostRequest(url: String, tail: String):String{
     return suspendCoroutine{
@@ -141,12 +141,16 @@ private object NetRequest {
     fun innerSendGetRequest(url: String, back: Back) {
         var connection = URL(url).openConnection() as HttpURLConnection
         //配置连接
-        connection.apply {
-            connectTimeout = 5000
-            readTimeout = 5000
-            defaultUseCaches = false
-            doInput = true
-            requestMethod = "GET"
+        try {
+            connection.apply {
+                connectTimeout = 5000
+                readTimeout = 5000
+                defaultUseCaches = false
+                doInput = true
+                requestMethod = "GET"
+            }
+        }catch (e:java.lang.Exception){
+            Log.e(TAG, "innerSendGetRequest: 已经被连接了",e)
         }
         //获取网络请求结果
         getResult(connection, back)

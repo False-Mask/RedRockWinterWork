@@ -6,11 +6,14 @@ interface MainActivityContract {
     interface MainActivityIModel{
         fun  getLoginUrl(): String
         fun playList(): String
+        fun getBanner(): String
     }
     interface MainActivityIView{
         fun initFragment()
     }
     interface MainActivityPresenter{
         fun loginAuto()
+        fun getBanner()
+        fun onUnavailable()
     }
 }

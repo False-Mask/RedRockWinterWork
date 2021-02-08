@@ -1,16 +1,11 @@
 package com.example.neteasecloudmusic.loginactivity.loginbyphone
 
-import android.util.Log
 import com.example.neteasecloudmusic.mytools.net.SendNetRequest
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-
+//数据对象
+var loginResult = ByPhoneModel.LoginResult()
 class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
 
     private val TAG = "ByPhoneModel"
-
-    //数据对象
-    var loginResult = LoginResult()
 
     //主机名 除去了末尾的 "/"
     private val baseUrl = "http://sandyz.ink:3000"
@@ -19,27 +14,27 @@ class ByPhoneModel : ByPhoneContract.ByPhoneIModel {
     private var sendNetRequest = SendNetRequest()
 
     //登陆
-    override fun login(phoneNumber: String, passwordText: String): LoginResult {
+    override fun login(phoneNumber: String, passwordText: String): String {
         //http请求貌似不太安全(配了啥我也不懂)
         System.setProperty("https.protocols", "TLSv1.2,TLSv1.1,TLSv1,SSLv3")
         var string: String = "/login/cellphone"
 
-        sendNetRequest.sendGetRequest("$baseUrl$string?phone=$phoneNumber&password=$passwordText"
-                , object : SendNetRequest.Back {
-            override fun onResponded(resultBody: String) {
-                Log.d(TAG, "login onResponded: ")
-                var gson = Gson()
-                var type=object : TypeToken<LoginResult>(){}.type
-                loginResult = gson.fromJson(resultBody, type)
-                Log.d(TAG, "onResponded: "+loginResult.toString())
-            }
-
-            override fun onFailed(respondCode: Int) {
-                Log.d(TAG, "login onFailed: ")
-            }
-
-        })
-         return loginResult
+//        sendNetRequest.sendGetRequest("$baseUrl$string?phone=$phoneNumber&password=$passwordText"
+//                , object : SendNetRequest.Back {
+//            override fun onResponded(resultBody: String) {
+//                Log.d(TAG, "login onResponded: ")
+//                var gson = Gson()
+//                var type=object : TypeToken<LoginResult>(){}.type
+//                loginResult = gson.fromJson(resultBody, type)
+//                Log.d(TAG, "onResponded: "+loginResult.toString())
+//            }
+//
+//            override fun onFailed(respondCode: Int) {
+//                Log.d(TAG, "login onFailed: ")
+//            }
+//
+//        })
+            return "$baseUrl$string?phone=$phoneNumber&password=$passwordText"
     }
     class LoginResult {
         var account: Account?=null

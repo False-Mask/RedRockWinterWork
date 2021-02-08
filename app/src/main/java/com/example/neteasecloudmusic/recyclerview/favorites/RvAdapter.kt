@@ -10,8 +10,10 @@ import com.bumptech.glide.Glide
 import com.example.neteasecloudmusic.MyApplication
 import com.example.neteasecloudmusic.R
 //list为 recyclerView中的Item的集合
+//声明顶层 方便修改
 var list:MutableList<Favorites> = mutableListOf()
-class RvAdapter(var mlist: MutableList<Favorites>) : RecyclerView.Adapter<RvAdapter.MyHolder>() {
+class RvAdapter : RecyclerView.Adapter<RvAdapter.MyHolder>() {
+    var myCall:Call?=null
     class MyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             var name:TextView=itemView.findViewById(R.id.favorite_item_title)
             var trackCount:TextView=itemView.findViewById(R.id.favorite_item_count)
@@ -20,6 +22,9 @@ class RvAdapter(var mlist: MutableList<Favorites>) : RecyclerView.Adapter<RvAdap
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RvAdapter.MyHolder {
         var view=LayoutInflater.from(parent.context).inflate(R.layout.favorites_rv_item,parent ,false)
+        view.setOnClickListener{
+            myCall?.onItemClicked(view,viewType)
+        }
         return MyHolder(view)
     }
 
@@ -31,9 +36,19 @@ class RvAdapter(var mlist: MutableList<Favorites>) : RecyclerView.Adapter<RvAdap
         var item=list.get(position)
         holder.apply {
             name.text=item.name
-            trackCount.text="第${item.trackCount}个"
+            trackCount.text="${item.trackCount}首"
             Glide.with(MyApplication.getContext()).load(item.images).into(coverImage)
         }
     }
+    fun setOnItemClicked(call:Call){
+        this.myCall=call
+    }
 
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
+
+    interface Call{
+        fun onItemClicked(view:View,position: Int)
+    }
 }

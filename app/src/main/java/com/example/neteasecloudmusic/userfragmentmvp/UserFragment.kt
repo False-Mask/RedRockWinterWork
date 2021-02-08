@@ -9,27 +9,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.neteasecloudmusic.MainActivity
-import com.example.neteasecloudmusic.MyApplication
 import com.example.neteasecloudmusic.R
+import com.example.neteasecloudmusic.favoriteslist.FavoritesActivity
 import com.example.neteasecloudmusic.loginactivity.LoginActivity
+import com.example.neteasecloudmusic.mytools.filedownload.mContext
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
-import com.example.neteasecloudmusic.recyclerview.favorites.Favorites
 import com.example.neteasecloudmusic.recyclerview.favorites.RvAdapter
 import com.example.neteasecloudmusic.useui.UserUiActivity
-import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.second_fragment_layout.*
-var Mlist:MutableList<Favorites> = mutableListOf()
-var rvAdapter=RvAdapter(Mlist)
+import java.io.File
+
+//Model层需要用到
+var rvAdapter=RvAdapter()
+var sp: SharedPreferences? = mContext.getSharedPreferences(UserFragment.USER_BASIC_SP_NAME, Context.MODE_PRIVATE)
 class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
     //获取context
     var mcontext=mactivity
     var presenter=UserPresenter(this)
     var activity=mactivity
     //sp数据库实例(方便抓数据)
-    var sp: SharedPreferences? = mcontext.getSharedPreferences(USER_BASIC_SP_NAME, Context.MODE_PRIVATE)
     //sp数据库的名称
     companion object{
         val USER_BASIC_SP_NAME="user_basic_data"
@@ -57,10 +57,17 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
                 startActivity(intent)
             }
         }
+        //RecyclerView被点击
+        rvAdapter.setOnItemClicked(object : RvAdapter.Call{
+            override fun onItemClicked(view: View, position: Int) {
+                presenter.rvItemClicked(view,position)
+            }
+
+        })
     }
 
     //未登录时候的初始化界面
-    override fun initIconAndName(icon: String?, name: String?,phoneNumber:String?,password:String?) {
+    override fun initIconAndName(icon: File?, name: String?) {
         //更改用户的头像
         Glide.with(this).load(icon).into(user_head_show_icon)
         //更改用户的名称
@@ -69,10 +76,6 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
         context?.getSharedPreferences(USER_BASIC_SP_NAME,Context.MODE_PRIVATE)
             ?.put {
                 putBoolean("is_login",true)
-                putString("user_name",name)
-                putString("user_icon_url",icon)
-                putString("user_phone_number",phoneNumber)
-                putString("user_password",password)
             }
     }
 
@@ -82,11 +85,15 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
         presenter.initView(sp!!)
     }
 
+    override fun favoritesClicked(v: View, position: Int) {
+        var intent=Intent(mcontext,FavoritesActivity::class.java)
+        intent.putExtra("position",position)
+        startActivity(intent)
+    }
+
     //改变user的界面
-    override fun changeUserTitle(username: String?, userIconUrl: String?) {
+    override fun changeUserTitle(username: String?, userIconUrl: File?) {
         user_name.text=username
         Glide.with(MainActivity.secondFragment).load(userIconUrl).into(user_head_show_icon)
     }
-
-
 }
