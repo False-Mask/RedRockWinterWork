@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
                 bottom_music.setImageResource(R.drawable.music_icon_2)
                 music_text.setTextColor(resources.getColor(R.color.bottom_text_color))
                 hideAll(transaction)
-                    transaction.show(firstFragment)
+                transaction.show(firstFragment)
                     //这里也得初始化视图
                 firstFragment.initView()
             }

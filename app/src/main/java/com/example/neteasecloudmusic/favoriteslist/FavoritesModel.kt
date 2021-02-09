@@ -4,7 +4,7 @@ import com.example.neteasecloudmusic.mainactivitymvp.baseUrl
 var playListDetailsResult= FavoritesModel.PlayListDetails()
 class FavoritesModel :FavoritesContract.FavoritesIModel{
     override fun getSongs(favoriteId: String): String {
-        return "$baseUrl/playlist/detail?id=$String"
+        return "$baseUrl/playlist/detail?id=$favoriteId"
     }
 
     //歌单的详细信息 歌曲的地址 歌手的背景啥的

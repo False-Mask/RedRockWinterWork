@@ -13,3 +13,12 @@ data class Songs(
         const val serialVersionUID = 123L
     }
 }
+
+data class Song(var artist:String="",
+                var image:File?=null,
+                var songName:String="",
+                var songId:String=""):Serializable{
+    companion object{
+        const val serialVersionUID = 124L
+    }
+}

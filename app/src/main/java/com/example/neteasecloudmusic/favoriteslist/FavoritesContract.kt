@@ -1,7 +1,11 @@
 package com.example.neteasecloudmusic.favoriteslist
 
+import com.example.neteasecloudmusic.favoriteslist.songs.SongRvAdapter
+
 interface FavoritesContract {
     interface FavoritesIView {
+        fun progressBarOn()
+        fun progressBarOff()
 
     }
 
@@ -10,6 +14,6 @@ interface FavoritesContract {
 
     }
     interface FavoritesIPresenter {
-        fun getSongs(position: Int?)
+        fun getSongs(position: Int?, songRvAdapter: SongRvAdapter)
     }
 }

@@ -19,7 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="n">
-        <activity android:name=".favoriteslist.FavoritesActivity"></activity>
+        <activity android:name=".favoriteslist.songui.SongUiActivity"></activity>
+        <activity android:name=".favoriteslist.FavoritesActivity" />
         <activity android:name=".useui.UserUiActivity" />
         <activity android:name=".register.RegisterActivity" />
         <activity android:name=".loginactivity.LoginByCloudActivity" />
