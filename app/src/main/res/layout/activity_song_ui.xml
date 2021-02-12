@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".favoriteslist.songui.SongUiActivity">
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/song_ui_seek_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline12" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -231,7 +241,7 @@
             app:layout_constraintEnd_toStartOf="@+id/guideline17"
             app:layout_constraintStart_toStartOf="@+id/guideline15"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/play" />
+            app:srcCompat="@drawable/pause" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline24"

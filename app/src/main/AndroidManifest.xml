@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="n">
-        <activity android:name=".favoriteslist.songui.SongUiActivity"></activity>
+        <activity android:name=".favoriteslist.songui.SongUiActivity" />
         <activity android:name=".favoriteslist.FavoritesActivity" />
         <activity android:name=".useui.UserUiActivity" />
         <activity android:name=".register.RegisterActivity" />
@@ -33,6 +33,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".mytools.musicservice.MyMusicService"
+                 android:enabled="true"
+                android:exported="true"/>
     </application>
 
 </manifest>

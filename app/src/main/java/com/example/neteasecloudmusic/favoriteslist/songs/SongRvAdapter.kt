@@ -95,9 +95,21 @@ class SongRvAdapter : RecyclerView.Adapter<SongRvAdapter.Holder>() {
     fun setList(list: MutableList<Song>) {
         //头是前面的head
         //尾是结束白框框
-        list.add(0, Song())
+        //去除前后的Song()
+        list.add(0,Song())
         list.add(Song())
         songList = list
+    }
+
+    fun resume(list: MutableList<Song>){
+        if (list.isNotEmpty()){
+            //去掉最前面的
+            list.removeAt(0)
+            if (list.isNotEmpty()){
+                //去掉最后面的
+                list.removeAt(list.size-1)
+            }
+        }
     }
 
     //添加Click的接口回调

@@ -85,6 +85,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
             //初始化一下布局
             withContext(Dispatchers.Main){
                 songRvAdapter.notifyDataSetChanged()
+                songRvAdapter.resume(songList)
             }
             //网络请求
             try {
@@ -127,6 +128,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                         songRvAdapter.setList(mSongList)
                         //歌单列表刷新
                         songRvAdapter.notifyDataSetChanged()
+                        songRvAdapter.resume(mSongList)
                     }
                 }catch (e:Exception){
                     Log.e(TAG, "getSongs: 第${mSongList.size}首歌曲解析故障", e)

@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     val TAG="MainActivity"
     //初始化presenter
     var presenter=MainActivityPresenter(this)
+    //
+
     //Fragment定义并初始化
     companion object MyFragment{
         lateinit var secondFragment:UserFragment
