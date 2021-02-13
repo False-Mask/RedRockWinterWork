@@ -4,7 +4,9 @@ import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import com.example.neteasecloudmusic.favoriteslist.songs.Song
+import com.example.neteasecloudmusic.favoriteslist.songs.Songs
 import com.example.neteasecloudmusic.mytools.musicservice.MyMusicService
+import com.example.neteasecloudmusic.mytools.musicservice.ServiceSong
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -16,6 +18,10 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
     val TAG="SongPresenter"
     var view=activity
     var model=SongModel()
+    //当出现上一首和下一首的情况就不用重新去请求数据了
+    private lateinit var songPlayList:MutableList<Song>
+    var position:Int=0
+
     lateinit var song:Song
     lateinit var musicService: MyMusicService
 
@@ -28,42 +34,42 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         song: Song,
         musicService: MyMusicService
     ) {
-        this.song=song
         val isPlaying=musicService.getIsPlaying()
         //第一次播放 而且以前还没有播放过
         if (!isPlaying && musicService.getCurrentPosition()==0){
             view.iconChangeToPlay()
             //获取网络请求的发送地址
             //////////////////////////////////////////////////////////////////////////////////////
-            playMusic(song.songId)
+            playMusic(this.song.songId)
         }
         //如果正在播放
         else if (isPlaying){
             //同步一下进度条 可能存在 退出和没退出播放两种情况
-            musicService.beginToRefreshBar()
+            //musicService.beginToRefreshBar()
             //1 播放id相同 -> 暂停
-            if (song.songId==musicService.getMySongId()){
+            if (this.song.songId==musicService.getMySongId()){
                 //暂停音乐
                 musicService.pauseMusic()
                 //同步bar最大值
-                view.setSeekBarMaxProgress(musicService.getDuration())
+                //view.setSeekBarMaxProgress(musicService.getDuration())
                 //改变成暂停图标
                 view.iconChangeToPause()
             }
             //2 播放id不同 -> 占据music
+            //
             else{
                 //使得音乐处于idle状态
-                musicService.stopMusic()
+                musicService.resetMusic()
                 //播放
-                playMusic(song.songId)
+                playMusic(this.song.songId)
                 //改变为播放
                 view.iconChangeToPlay()
             }
         }
-        //播放了没有退出
+        //播放了没有退出 暂停状态
         else if (musicService.getCurrentPosition()!=0){
             view.iconChangeToPlay()
-            musicService.startMusic(song.songId)
+            //musicService.startMusic(this.song.songId)
         }
     }
 
@@ -91,7 +97,7 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
                 else-> {
                     //设置bar的最大值
                     //view.setSeekBarMaxProgress(musicService.getDuration())
-                    musicService.prepareMusicByNet(songUrl,song.songId)
+                   // musicService.prepareMusicByNet(song.songId)
                 }
             }
         }
@@ -120,7 +126,30 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         song: Song,
         musicService: MyMusicService
     ) {
-        this.song=song
+        //1 已经播放到最后一首了 那就播放第一首
+        //由于加上了第一个view和最后一个view所以最后一首的坐标是size-2
+        if (position==songPlayList.size-2){
+            //播放位置和播放音乐都调整到第一首
+            this.position=1
+            this.song=songPlayList[1]
+        }
+        //还没到最后一首
+        else{
+            this.position++
+            this.song=songPlayList[position]
+        }
+        //还可能当前正在播放或者没有在播放
+        if (musicService.getCurrentPosition()!=0){
+            //正在播先停掉
+            musicService.resetMusic()
+        }
+        //初始化播放布局
+        //ok地址和歌曲信息给view了
+        view.initView(this.song, this.position, Songs(songPlayList))
+        //播放歌曲
+        playMusic(this.song.songId)
+        //播放按键变一下
+        view.iconChangeToPlay()
     }
 
     override fun lastSong(
@@ -128,18 +157,43 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         song: Song,
         musicService: MyMusicService
     ) {
-        this.song=song
+        //1 已经播放到最后一首了 那就播放第一首
+        //由于加上了第一个view和最后一个view所以最后一首的坐标是size-2
+        if (position==1){
+            //播放位置和播放音乐都调整到最后一首
+            this.position=songPlayList.size-2
+            this.song=songPlayList[position]
+        }
+        //还没到最后一首
+        else{
+            this.position--
+            this.song=songPlayList[position]
+        }
+        //还可能当前正在播放或者没有在播放
+        if (musicService.getCurrentPosition()!=0){
+            //正在播先停掉
+            musicService.resetMusic()
+        }
+        //初始化播放布局
+        //ok地址和歌曲信息给view了
+        view.initView(this.song, this.position, Songs(songPlayList))
+        //播放歌曲
+        playMusic(this.song.songId)
+        //播放按键变一下
+        view.iconChangeToPlay()
     }
     //当点开Activity的时候
-    override fun initView() {
-        //1 播放状态->
+    override fun initView(songList: MutableList<Song>, position: Int?) {
+        //初始化
+        this.position=position!!
+        this.songPlayList=songList
+        this.song=songList[position]
+        //1 现在处于 播放状态
         if (musicService.getIsPlaying()){
             // 1 播放id与现在activity的id是一致的
             if (musicService.getMySongId()==view.song.songId){
-                //开始刷新Bar
-                musicService.beginToRefreshBar()
                 //设置progressbar和SeekBar的最大值
-                view.setSeekBarMaxProgress(musicService.getDuration())
+                view.setMusicMaxProgress(musicService.getDuration())
                 //设置button
                 view.iconChangeToPlay()
             }
@@ -148,15 +202,19 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
                 //不管就默认
             }
         }
-        //2 未播放状态
+        //2 现在处于 未播放状态
         else{
-            //不管
-            if (musicService.getCurrentPosition()!=0){
-                view.setSeekBarMaxProgress(musicService.getDuration())
+            //播放过 而且退出了 重新进入界面时的情况
+            if (musicService.getCurrentPosition()!=0 && musicService.getMySongId()==song.songId){
+                view.setMusicMaxProgress(musicService.getDuration())
                 view.setCurrentSeekBarProgressTo(musicService.getCurrentPosition())
                 view.setCurrentTextProgressTo(musicService.getCurrentPosition())
             }
         }
+    }
+
+    override fun onMusicCompletion() {
+
     }
 
     //SeekBar的监听
@@ -164,13 +222,34 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         view.setCurrentTextProgressTo(progress)
     }
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
-        //第一次使用
-        if (!musicService.getIsPlaying() && musicService.getCurrentPosition()==0){
-            musicService.startMusic(song.songId)
-        }
+
     }
 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        musicService.seekMusicTo(seekBar?.progress!!)
+        //第一次使用
+        if (!musicService.getIsPlaying() && musicService.getCurrentPosition()==0){
+            playMusic(song.songId)
+            view.iconChangeToPlay()
+        }
+        //之前播放过
+        else if (musicService.getCurrentPosition()!=0){
+            //如果播放的歌曲匹配
+            if (this.song.songId==musicService.getMySongId()){
+                //当停止滑动的时候 把音乐拖动播放到指定位置处
+                musicService.seekMusicTo(seekBar?.progress!!)
+            }
+            //不匹配
+            else{
+                //占据该音乐的播放
+                musicService.resetMusic()
+                playMusic(this.song.songId)
+            }
+        }
     }
+
+
+//    suspend fun getSong(url:String):ServiceSong{
+//        var respondBody= sendGetRequest(url)
+//
+//    }
 }

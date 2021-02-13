@@ -4,9 +4,8 @@ import com.example.neteasecloudmusic.mainactivitymvp.baseUrl
 
 class SongModel :SongContract.SongIModel{
     override fun getUrl(songId: String): String {
-        return "$baseUrl/song/url?id=${1329538017}"
+        return "$baseUrl/song/url?id=${songId}"
     }
-
 
     //歌曲的详细信息
     data class SongData(

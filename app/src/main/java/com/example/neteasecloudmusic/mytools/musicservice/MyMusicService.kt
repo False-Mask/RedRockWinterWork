@@ -7,15 +7,34 @@ import android.media.MediaPlayer
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
+import com.example.neteasecloudmusic.favoriteslist.songui.songThread
+import com.example.neteasecloudmusic.mytools.net.sendGetRequest
+import com.google.gson.Gson
 import kotlinx.coroutines.*
-//存放一个歌曲的id这样就可以时刻知道正在播放
-private var MySongId="NULL"
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import java.io.Serializable
+
+//刷新音乐的协程
 var MusicRefreshJob= Job()
 var MusicRefreshThread= CoroutineScope(MusicRefreshJob)
+
+//顶层方法 主要是告诉Service View还活着没 死了就不要调用刷新他丫的视图
+//免得闪退
+fun setViewStatus(boolean: Boolean){
+    isViewAlive=boolean
+}
+
+//存放一个歌曲的id这样就可以时刻知道正在播放
+private var MySongId="NULL"
+
+//绑定的view是否还活着
 private var isViewAlive = false
+
 //单例了 免得到时候 重复播放
 private val mediaPlayer:MediaPlayer= MediaPlayer()
+
+private val bindViewList= mutableListOf<IServiceBindView>()
 class MyMusicService : Service()
         //出错的监听                    //缓冲监听
         , MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener
@@ -24,47 +43,48 @@ class MyMusicService : Service()
         //进度拉取完成的监听
         , MediaPlayer.OnSeekCompleteListener {
 
-    //Binder可以看成是服务和用户的连接
-    //他实现了IBinder 可以通过强转得到IBinder
-    inner class MyBinder: Binder() {
-        fun getService(): MyMusicService {
-            return this@MyMusicService
-        }
-    }
+    //默认playType为正序播放下一首
+    var playType:PlayType=PlayType.PlayInOrderNext
+    //防止多次刷新
+    var isRefreshing=false
 
-    companion object {
-        fun setViewStatus(boolean: Boolean){
-            isViewAlive=boolean
-        }
-    }
-
-    fun getMySongId(): String {
-        return MySongId
-    }
-
+    //变量
     val TAG="MyMusicService"
-    //检测是否已经开始动态刷新seekBar(也可认为是是否正在播放)
-    var isStarted = false
 
-
-    //获取一些MediaPlayer基本属性
-    fun getIsPlaying(): Boolean {
-        return mediaPlayer.isPlaying
-    }
-    fun getIsLooping(): Boolean {
-        return mediaPlayer.isLooping
-    }
-    fun getDuration(): Int {
-        return mediaPlayer.duration
-    }
-    fun getCurrentPosition(): Int {
-        return mediaPlayer.currentPosition
-    }
+    private var position:Int=0
 
     private val binder=MyBinder()
 
-    lateinit var songUiActivity:SongUiActivity
+    //外部加入的song
+    private var songList:MutableList<ServiceSong>?=null
 
+    private var song:ServiceSong?=null
+    //绑定的songPre
+
+    private lateinit var songPre: IServiceBindPresenter
+
+
+    private lateinit var songUi:IServiceBindView
+
+    //service放回的给view的data
+
+    private lateinit var serviceData:ServiceBackData
+
+    //是否刷新
+
+    private var doRefreshing=false
+
+    private val baseUrl="http://sandyz.ink:3000"
+
+    private val url="/song/url?id="
+
+
+    //service自己发送获得的song的数据
+
+    private lateinit var serviceSongData:SongData
+
+
+    //Service的几个生命周期所对应的回调方法
     override fun onBind(intent: Intent?): IBinder? {
         return binder
     }
@@ -85,14 +105,85 @@ class MyMusicService : Service()
         //创建绑定后处于粘着状态 程序不挂我不挂
         return START_STICKY
     }
-    //准备播放
-    fun prepareMusicByNet(url:String,songId: String){
+
+    //Binder可以看成是服务和用户的连接
+    //他实现了IBinder 可以通过强转得到IBinder
+    inner class MyBinder: Binder() {
+        fun getService(): MyMusicService {
+            return this@MyMusicService
+        }
+    }
+
+    enum class PlayType{
+        Loopering,PlayInOrderNext,PlayInOrderLast
+    }
+
+    /////////////////////////////////////////////////////////////////
+    //添加绑定的视图
+    fun addBindView(songUiActivity:IServiceBindView){
+        this.songUi=songUiActivity
+        bindViewList.add(songUiActivity)
+    }
+
+    fun addBindPresenter(songPresenter:IServiceBindPresenter){
+        this.songPre=songPresenter
+    }
+
+    //获取一些MediaPlayer基本属性
+    fun getIsPlaying(): Boolean {
+        return mediaPlayer.isPlaying
+    }
+    fun getIsLooping(): Boolean {
+        return mediaPlayer.isLooping
+    }
+    fun getDuration(): Int {
+        return mediaPlayer.duration
+    }
+    fun getCurrentPosition(): Int {
+        return mediaPlayer.currentPosition
+    }
+
+    fun getMySongId(): String {
+        return MySongId
+    }
+
+    //发送并获取网络歌曲的url
+    private suspend fun getMusicUrl(url: String): String {
+        return try {
+            val resultBody=sendGetRequest(url)
+            serviceSongData=Gson().fromJson(resultBody, SongData::class.java)
+            //表示请求成功 并且还拿到了链接
+            if (serviceSongData.code==200 && serviceSongData.data[0].code!=404){
+                serviceSongData.data[0].url
+            }
+            else{
+                "NULL"
+            }
+        }catch (e:Exception){
+            Log.e(TAG, "请求音乐链接错误",e )
+            "ERRO"
+        }
+    }
+
+
+
+    //准备并播放音乐播放
+    private fun prepareMusicByNet(songUrl: String){
+                /**
+                 *  var songName: String,
+                    var singer: String,
+                    var Imageurl: String,
+                    var duration: Int,
+                    var currentTime: Int,
+                    var songId: String
+                 */
+
             try {
                 mediaPlayer.apply {
                     //配置播放信息
                     setAudioAttributes(AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
                     //设置播放源
-                    setDataSource(url)
+                    setDataSource(songUrl)
                     //准备播放(异步准备)
                     prepareAsync()
                     //配置一堆监听
@@ -103,21 +194,104 @@ class MyMusicService : Service()
                         setOnBufferingUpdateListener(this@MyMusicService)
                         setOnSeekCompleteListener(this@MyMusicService)
                     }
-                    //设置播放id
-                    MySongId=songId
                 }
             }catch (e:Exception){
                 Log.e(TAG, "MediaPlayer准备过程中出现异常",e )
             }
     }
     //开始播放音乐
-    fun startMusic(songId: String){
-        MySongId=songId
+   private fun startMusic(){
         if (!mediaPlayer.isPlaying){
             mediaPlayer.start()
+            //开始刷新 每1秒刷新一次
+            //允许刷新
+            doRefreshing=true
+
+            //view还活着就调用刷新
+            if (isViewAlive){
+                refreshMusicPlayerStatus()
+            }
         }
-        beginToRefreshBar()
     }
+    //start
+     fun pauseToStart(){
+        mediaPlayer.start()
+    }
+
+    //根据songId播放音乐 播放单曲不具有 自动切换下一曲的功能
+    fun playMusic(song: ServiceSong) {
+        //自动初始song
+        this.song=song
+        //同步当前播放的id
+        MySongId=song.songId
+        val url1=baseUrl+url+song.songId
+        songThread.launch (IO){
+            //获取音乐的信息
+            val songUrl= getMusicUrl(url1)
+            //播放网络url 3种情况的处理
+            serviceData= ServiceBackData()
+            serviceData.apply {
+                Imageurl= song.image
+                this.songId= song.songId
+                singer= song.artist
+                songName= song.songName
+            }
+            when(songUrl){
+                // 1 没有找到资源
+                "NULL"-> withContext(Main){
+                    songUi.sendToast("未找到该资源")
+                    //把图标变回来
+                    songUi.iconChangeToPause()
+                    comeAcrossError()
+                }
+                // 2 解码错误
+                "ERRO"-> withContext(Main){
+                    songUi.sendToast("音乐解码错误")
+                    //把图标变回来
+                    songUi.iconChangeToPause()
+                    comeAcrossError()
+                }
+                // 3 成功
+                else-> {
+                    withContext(Main){
+                        prepareMusicByNet(songUrl)
+                    }
+                }
+            }
+
+        }
+    }
+
+    //自动关联list播放完以后自动依照模式播放
+    fun playMusic(songList: MutableList<ServiceSong>, position: Int){
+        this.songList=songList
+        this.position=position
+        playMusic(songList[position])
+    }
+
+
+    private fun refreshMusicPlayerStatus() {
+        if (!isRefreshing){
+            MusicRefreshThread.launch (IO){
+                while (doRefreshing){
+                    isRefreshing=true
+                    //每一秒刷新一下
+                    delay(1000)
+                    withContext(Main){
+                        songUi.serviceRefresh  (serviceData.songName,
+                                serviceData.singer,
+                                serviceData.Imageurl,
+                                getDuration(),
+                                getCurrentPosition(),
+                                serviceData.songId)
+                    }
+                }
+                isRefreshing=false
+            }
+        }
+    }
+
+
     //暂停音乐
     fun pauseMusic() {
         mediaPlayer.pause()
@@ -130,65 +304,170 @@ class MyMusicService : Service()
     fun stopMusic(){
         mediaPlayer.stop()
     }
-    //退出播放
+    //退出播放状态 进入reset状态
     fun resetMusic(){
+        //停止下来
+        doRefreshing=false
         mediaPlayer.reset()
     }
-
-
 
 
     //错误时的回调
     override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
         //true表示继续播放 false表示继续播放 true后调用complete
-        Log.e(TAG, "onError: " )
+        comeAcrossError()
         return true
     }
+
+   private fun comeAcrossError(){
+        when (playType) {
+            PlayType.PlayInOrderLast -> {
+                //播放下一个
+                playNextSong()
+            }
+            PlayType.PlayInOrderLast -> {
+                //播放上一个
+                playLastSong()
+            }
+            PlayType.Loopering -> {
+                //停止播放
+                resetMusic()
+            }
+            else->{}
+        }
+    }
+
     //缓存更新的时候回调
     override fun onBufferingUpdate(mp: MediaPlayer?, percent: Int) {
-        songUiActivity.setBufferedBarPercent(percent)
+        songUi.setBufferedProgress(percent)
     }
     override fun onCompletion(mp: MediaPlayer?) {
-        songUiActivity.iconChangeToPlay()
+        //音乐播放完成
+        //表明添加的是songList
+        //那就自动播放内容
+        //songPre.onMusicCompletion()
+        when(playType){
+            PlayType.PlayInOrderNext-> playNextSong()
+            PlayType.PlayInOrderLast-> playLastSong()
+            PlayType.Loopering-> playLoop()
+            else->{}
+        }
+    }
+
+    private fun playLoop() {
+        if (song!=null){
+            playMusic(song!!)
+        }
+    }
+
+    //播放下一首
+    private fun playLastSong() {
+        if(songList!=null){
+            if (position==0){
+                position=songList!!.size-1
+            }else{
+                position--
+            }
+            if (getCurrentPosition()!=0){
+                resetMusic()
+            }
+            //准备并播放歌曲
+            playMusic(songList!!,position)
+        }
+    }
+
+    //播放下一首
+    private fun playNextSong() {
+        if (songList!=null){
+            if(position<songList!!.size-1){
+                position++
+            }else{
+                //最后一首
+                position=0
+            }
+            //播放过的
+            if (getCurrentPosition()!=0){
+                resetMusic()
+            }
+            //准备并播放音乐
+            playMusic(songList!!,position)
+        }
     }
 
     //准备完成的回调
     override fun onPrepared(mp: MediaPlayer?) {
-        //设置进度条
-        songUiActivity.setSeekBarMaxProgress(mediaPlayer.duration)
-        mp?.start()
-        beginToRefreshBar()
-    }
-
-
-
-    //同步SeekBar
-    fun beginToRefreshBar() {
-        //如果没开始->开始刷新
-        isStarted=getIsPlaying()
-        if (isStarted&&isViewAlive) {
-            MusicRefreshThread.launch (Dispatchers.IO){
-                while (mediaPlayer.isPlaying && isViewAlive){
-                    delay(1000)
-                    var mService=this@MyMusicService
-                    withContext(Dispatchers.Main){
-                        val current=mediaPlayer.currentPosition
-                        //设置progressbar和text的内容
-                        mService.songUiActivity.setCurrentTextProgressTo(current)
-                        mService.songUiActivity.setCurrentSeekBarProgressTo(current)
-                        mService.songUiActivity.setBufferedBarPercent(current)
-                    }
-                }
-                //结束了可以重新开始
-                isStarted=false
-            }
+        startMusic()
+        if(isViewAlive){
+            //设置进度条
+            songUi.setMusicMaxProgress(mediaPlayer.duration)
         }
     }
 
+    //拖动完成
     override fun onSeekComplete(mp: MediaPlayer?) {
+        songPre.onMusicSeekComplete(mp)
     }
 
-    fun addBindView(songUiActivity: SongUiActivity) {
-        this.songUiActivity=songUiActivity
+    //返回的数据
+    data class ServiceBackData(var songName: String="",
+                               var singer: String="",
+                               var Imageurl: String="",
+                               var duration: Int=0,
+                               var currentTime: Int=0,
+                               var songId: String=""){
+
     }
 }
+
+//服务端的song
+//由于在线播放的内容太多了
+//本地下载多半是行不通的只能是播放哪Glide动态加载哪里
+data class ServiceSong(var artist:String="",
+                       var image:String="",
+                       var songName:String="",
+                       var songId:String=""): Serializable {
+    companion object{
+        const val serialVersionUID = 1000L
+    }
+}
+
+//歌曲的详细信息
+data class SongData(
+        var code: Int = 0,
+        var `data`: List<Data> = listOf()
+)
+
+data class Data(
+        var br: Int = 0,
+        var canExtend: Boolean = false,
+        var code: Int = 0,
+        var encodeType: String = "",
+        var expi: Int = 0,
+        var fee: Int = 0,
+        var flag: Int = 0,
+        var freeTimeTrialPrivilege: FreeTimeTrialPrivilege = FreeTimeTrialPrivilege(),
+        var freeTrialInfo: Any? = Any(),
+        var freeTrialPrivilege: FreeTrialPrivilege = FreeTrialPrivilege(),
+        var gain: Int = 0,
+        var id: Int = 0,
+        var level: String = "",
+        var md5: String = "",
+        var payed: Int = 0,
+        var size: Int = 0,
+        var type: String = "",
+        var uf: Any? = Any(),
+        var url: String = "",
+        var urlSource: Int = 0
+)
+
+data class FreeTimeTrialPrivilege(
+        var remainTime: Int = 0,
+        var resConsumable: Boolean = false,
+        var type: Int = 0,
+        var userConsumable: Boolean = false
+)
+
+data class FreeTrialPrivilege(
+        var resConsumable: Boolean = false,
+        var userConsumable: Boolean = false
+)

@@ -19,6 +19,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="n">
+        <activity android:name=".bannerwebview.BannerWebActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".favoriteslist.songui.SongUiActivity" />
         <activity android:name=".favoriteslist.FavoritesActivity" />
         <activity android:name=".useui.UserUiActivity" />
@@ -34,9 +41,10 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".mytools.musicservice.MyMusicService"
-                 android:enabled="true"
-                android:exported="true"/>
+        <service
+            android:name=".mytools.musicservice.MyMusicService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

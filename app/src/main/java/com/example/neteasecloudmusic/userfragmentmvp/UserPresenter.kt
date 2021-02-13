@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.Toast
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.HeadShowName
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.LoginCathe
-import com.example.neteasecloudmusic.loginactivity.loginbyphone.MyLoginCathe
+import com.example.neteasecloudmusic.loginactivity.loginbyphone.MyLoginCatheObjectFileName
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.loginResult
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.mContext
@@ -38,7 +38,7 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter{
             Log.d(TAG, "initView: 读取本地的用户缓存信息")
             var bool1:Boolean=false
             try {
-                loginCathe=readObjectFile(MyLoginCathe) as LoginCathe
+                loginCathe=readObjectFile(MyLoginCatheObjectFileName) as LoginCathe
                 bool1= loginCathe?.headShowImage?.exists() ?: false
             }catch (e:java.lang.Exception){
                 sp.put {
@@ -59,7 +59,7 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter{
                         putBoolean("is_head_show_exist",true)
                     }
                     try {
-                        loginCathe= readObjectFile(MyLoginCathe) as LoginCathe
+                        loginCathe= readObjectFile(MyLoginCatheObjectFileName) as LoginCathe
                     }catch (e:Exception){
                         Log.e(TAG, "initView: 读取头像信息时候出现问题",e)
                     }

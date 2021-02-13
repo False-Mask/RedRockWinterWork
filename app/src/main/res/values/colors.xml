@@ -7,7 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-
+    <color name="song_playing_color">#609BE8</color>
+    <color name="singer_name_color">#828282</color>
 
 <!--    底部导航栏的字体颜色-->
     <color name="bottom_text_color">#1296DB</color>

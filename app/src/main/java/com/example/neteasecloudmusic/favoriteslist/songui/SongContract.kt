@@ -18,6 +18,7 @@ interface SongContract {
         fun setSeekBarMaxProgress(duration: Int)
         fun setCurrentSeekBarProgressTo(current: Int)
         fun setBufferedBarPercent(percent: Int)
+        fun onMusicCompletion()
     }
     interface SongIPresenter{
         fun pauseOrPlay(
@@ -36,7 +37,8 @@ interface SongContract {
             musicService: MyMusicService
         )
 
-        fun initView()
+        fun initView(songList: MutableList<Song>, position: Int?)
+        fun onMusicCompletion()
 
     }
 }

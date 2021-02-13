@@ -11,6 +11,7 @@ import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadObjectFile
 import com.example.neteasecloudmusic.mytools.filedownload.imagePath
 import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
+import com.example.neteasecloudmusic.mytools.musicservice.MyMusicService
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
@@ -36,48 +37,51 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
     var view = activity
     var model = MainActivityModel()
 
+    //下载了歌单的封面和rv的更新 自动登陆
     override fun loginAuto() {
         //如果之前有过登陆
         if (sp.getBoolean("is_login",false)){
+            //先切线程到Main 因为 netWork的线程其实在分支线程 不能进行ui更新
             netThread.launch(Dispatchers.Main) {
+                //切到main 因为还得发送3条网络请求
                 withContext(Dispatchers.IO) {
-                    //io第一条
+                    //io 登陆
                     try {
                         var resultBody = sendGetRequest(model.getLoginUrl())
                         Log.d(TAG, "loginAuto: ")
                         loginResult = Gson().fromJson(resultBody, object : TypeToken<ByPhoneModel.LoginResult>() {}.type)
                     } catch (e: Exception) { }
-                    //io第二条
+                    //io第二条 获取用户的歌单信息(不是详细信息)
                     try {
                         var resultBody =  sendGetRequest(model.playList())
                         playListResult = Gson().fromJson<MainActivityModel.PlayListResult>(resultBody, object : TypeToken<MainActivityModel.PlayListResult>() {}.type)
                         Log.e(TAG, "loginAuto: ")
                     } catch (e: Exception) { }
 
-                    //从sp中找找看图片下载了没
+                    //从sp中找找看歌单封面图片下载了没
                     try {
                         var favorites=readObjectFile(FavoritesObjectFilesName) as MutableList<Favorites>
-                        var boolean=true
                         for (x in favorites){
                             if (!x.images.exists()) {
-                                boolean=false
                                 mainActivitySp.put {
                                     putBoolean("is_picture_exists",false)
                                 }
                             }
                         }
                     }catch (e:java.lang.Exception){
-                        Log.e(TAG, "loginAuto: 读取object文件出现异常",e)
+                        Log.e(TAG, "loginAuto: 读取歌单object文件出现异常",e)
                     }
 
                     var isPictureExists=mainActivitySp.getBoolean("is_picture_exists", false)
-                    //没有下载
+                    //获取需要下载歌单封面的个数
                     var count=playListResult.playlist?.size?:0
+                    //没有下载
                     if (!isPictureExists){
                         if (count!=0){
                             for (i in 0 until count){
                                 downLoadImage("$BaseFavoritesFileName$i",playListResult.playlist?.get(i)?.coverImgUrl?:"NULL")
                             }
+                            //提示sp库爷已经下载下来了
                             mainActivitySp.put {
                                 putBoolean("isPictureDownloaded",true)
                             }
@@ -88,30 +92,32 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
                                         Favorites(play?.name?:"NULL",play?.trackCount?:0,File("$imagePath/$BaseFavoritesFileName$i.jpg"))
                                 )
                             }
-
-                            //不知道为什么会爆EOF异常
-                            //下载文件
+                            //下载对象文件
                             downLoadObjectFile(FavoritesObjectFilesName,list)
                         }
-                        mainActivitySp.put {
-                            putBoolean("isPictureDownloaded",true)
-                        }
+//                        mainActivitySp.put {
+//                            putBoolean("isPictureDownloaded",true)
+//                        }
                     }
                     try {
+                        //list是adapter的顶层声明
                         list=readObjectFile(FavoritesObjectFilesName) as MutableList<Favorites>
                     }catch (e:java.lang.Exception){
                         Log.e(TAG, "loginAuto: 收藏夹读取时发送异常",e )
                     }
                 }
                 //main线程处理
+                //叫rv更新界面
                 rvAdapter.notifyDataSetChanged()
+                //
                 MyToast().sendToast(MyApplication.getContext(), "加载完成", Toast.LENGTH_SHORT)
+                //登陆是否成功的处理
                 if (loginResult.code == 200) {
                     Log.d(TAG, "自动登陆成功" + Thread.currentThread().name)
                     Log.d(TAG, "歌单为$playListResult")
                     MyToast().sendToast(MyApplication.getContext(), "登陆成功", Toast.LENGTH_SHORT)
                     if(list.size==0){
-                        MyToast().sendToast(MyApplication.getContext(), "出现错误", Toast.LENGTH_SHORT)
+                        Log.e(TAG, "loginAuto: 歌单数目为0")
                     }
 
                 } else {
@@ -123,28 +129,17 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
     //获取banner的视图
     override fun getBanner() {
-        var url=model.getBanner()
+        val url=model.getBanner()
         netThread.launch (Dispatchers.IO){
             //发送获取banner图片的url
             try {
                 val resultBody=sendGetRequest(url)
                 bannerResult=Gson().fromJson(resultBody,MainActivityModel.Banners::class.java)
                 val count=bannerResult.banners.size
+                //每一个banner有一个图片和点击跳转的url
                 val bannerList= mutableListOf<BannerData>()
-
                 //下载图片
                 for (i in 0 until count){
                     downLoadImage("banner$i", bannerResult.banners[i].pic)
@@ -167,6 +162,10 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
     }
 
     override fun onUnavailable() {
+
+    }
+
+    override fun addMusicService(musicService: MyMusicService) {
 
     }
 }

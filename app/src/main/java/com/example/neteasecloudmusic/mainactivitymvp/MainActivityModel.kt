@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.neteasecloudmusic.MyApplication
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.LoginCathe
-import com.example.neteasecloudmusic.loginactivity.loginbyphone.MyLoginCathe
+import com.example.neteasecloudmusic.loginactivity.loginbyphone.MyLoginCatheObjectFileName
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.loginResult
 import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
@@ -26,7 +26,7 @@ class MainActivityModel : MainActivityContract.MainActivityIModel{
         var password:String?=null
         var isLogin=sp.getBoolean("is_login",false)
         if (isLogin){
-            var mData= readObjectFile(MyLoginCathe) as LoginCathe
+            var mData= readObjectFile(MyLoginCatheObjectFileName) as LoginCathe
             phoneNumber=mData.phoneNumber
             password=mData.password
         }

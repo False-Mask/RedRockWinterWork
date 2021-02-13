@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.FavoritesActivity
 import com.example.neteasecloudmusic.loginactivity.LoginActivity
+import com.example.neteasecloudmusic.mainactivitymvp.playListResult
 import com.example.neteasecloudmusic.mytools.filedownload.mContext
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
 import com.example.neteasecloudmusic.recyclerview.favorites.RvAdapter
@@ -31,14 +33,27 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
     var activity=mactivity
     //sp数据库实例(方便抓数据)
     //sp数据库的名称
+
+
+    var TAG="UserFragment"
     companion object{
         val USER_BASIC_SP_NAME="user_basic_data"
     }
 
     //view被刚刚创建的时候
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view=inflater.inflate(R.layout.second_fragment_layout,container,false)
+        val view=inflater.inflate(R.layout.second_fragment_layout,container,false)
+
+        Log.e(TAG, "onCreateView: ")
         return view
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden){
+            //UserFragment浮现的时候
+
+        }
     }
 
     //当view被创建出来的时候
@@ -48,12 +63,12 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
         favorites_list.layoutManager=LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
         //用户头像被点击
         user_head_show_icon.setOnClickListener {
-           var isLogin= sp?.getBoolean("is_login",false)
+           val isLogin= sp?.getBoolean("is_login",false)
             if (!isLogin!!){
                 var intent=Intent(context,LoginActivity::class.java)
                 startActivity(intent)
             }else{
-                var intent=Intent(context,UserUiActivity::class.java)
+                val intent=Intent(context,UserUiActivity::class.java)
                 startActivity(intent)
             }
         }
@@ -86,8 +101,14 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView{
     }
 
     override fun favoritesClicked(v: View, position: Int) {
-        var intent=Intent(mcontext,FavoritesActivity::class.java)
+        val intent=Intent(mcontext,FavoritesActivity::class.java)
+
+        //把当前歌单的图片和创建者的头像 名字给FavoritesActivity
+
+        //intent.putExtra("creator_name", playListDetailsResult.playlist.creator.)
         intent.putExtra("position",position)
+        intent.putExtra("playListId", playListResult?.playlist?.get(position)?.id.toString())
+        intent.putExtra("useLocalCathe",false)
         startActivity(intent)
     }
 

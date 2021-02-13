@@ -29,7 +29,6 @@ import kotlinx.android.synthetic.main.activity_main.user_text as user_text1
 var context:MainActivity?=null
 class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView
         ,NetWorkChangeImp.NetCallback {
-
     //网络连接管理器
     private lateinit var connectivityManager:ConnectivityManager
     //连接变化的实现类
@@ -37,18 +36,20 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
 
     val TAG="MainActivity"
     //初始化presenter
-    var presenter=MainActivityPresenter(this)
-    //
-
+    //var presenter=MainActivityPresenter(this)
+    //由于MainActivity里面有通用的刷新视图的方法 presenter可能会被其他activity喊去帮忙干活
     //Fragment定义并初始化
     companion object MyFragment{
         lateinit var secondFragment:UserFragment
         lateinit var firstFragment:FirstFragment
+        lateinit var presenter:MainActivityPresenter
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //
+        presenter=MainActivityPresenter(this)
         //程序开始 初始化View视图
         initFragment()
         //注册网络连接变化的监听
@@ -69,7 +70,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     private fun registerNetListener() {
         //val intendFilter=IntentFilter()
         connectivityManager=getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        var request=NetworkRequest.Builder().build()
+        val request=NetworkRequest.Builder().build()
         connectivityManager.registerNetworkCallback(request,myListener)
     }
 
@@ -80,8 +81,8 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         bottom_user.setImageResource(R.drawable.user_icon_1)
         bottom_music.setImageResource(R.drawable.music_icon_1)
 
-        var manager=supportFragmentManager
-        var transaction=manager.beginTransaction()
+        val manager=supportFragmentManager
+        val transaction=manager.beginTransaction()
         //变色
         when(view.id){
             //用户点击  “用户”  选项
@@ -103,10 +104,9 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
                 music_text.setTextColor(resources.getColor(R.color.bottom_text_color))
                 hideAll(transaction)
                 transaction.show(firstFragment)
-                    //这里也得初始化视图
+                //这里也得初始化视图
                 firstFragment.initView()
             }
-
         }
         //提交
         transaction.commit()
@@ -117,8 +117,8 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         firstFragment=FirstFragment(this)
         secondFragment=UserFragment(this)
 
-        var manager=supportFragmentManager
-        var transaction=manager.beginTransaction()
+        val manager=supportFragmentManager
+        val transaction=manager.beginTransaction()
         //添加所有的Fragment
         transaction.add(R.id.frameLayout,firstFragment)
         transaction.add(R.id.frameLayout,secondFragment)
@@ -143,8 +143,9 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     }
 
 
-    //当有网络的时候自动登陆
+    //当有网络 两个是异步进行的
     override fun onAvailable() {
+        //下载了歌单的封面和rv的更新 自动登陆
         presenter.loginAuto()
         presenter.getBanner()
     }
@@ -153,5 +154,4 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         MyToast().sendToast(this,"网络出了亿点小问题~",Toast.LENGTH_SHORT)
         presenter.onUnavailable()
     }
-
 }

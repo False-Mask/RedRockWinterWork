@@ -45,10 +45,11 @@
     <string name="default_current_song_progress">00:00</string>
     <string name="default_total_progress">-- : --</string>
     <string name="song_image_content_description">歌曲封面</string>
-    <string name="last_content_description" >上一首</string>
+    <string name="last_content_description">上一首</string>
     <string name="play_pause_content_description">暂停或开始播放</string>
-    <string name="next_content_description" >下一首</string>
+    <string name="next_content_description">下一首</string>
     <string name="song_name">歌曲名称</string>
     <string name="singer_name">歌手</string>
     <string name="back_content_description">返回</string>
+    <string name="default_bottom_text_value" >音乐~</string>
 </resources>

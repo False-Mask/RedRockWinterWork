@@ -31,7 +31,7 @@ class FavoritesModel :FavoritesContract.FavoritesIModel{
         var description: Any? = Any(),
         var englishTitle: Any? = Any(),
         var highQuality: Boolean = false,
-        var id: Int = 0,
+        var id: Long = 0,
         var name: String = "",
         var newImported: Boolean = false,
         var opRecommend: Boolean = false,
@@ -54,7 +54,7 @@ class FavoritesModel :FavoritesContract.FavoritesIModel{
         var tracks: List<Track> = listOf(),
         var updateFrequency: Any? = Any(),
         var updateTime: Long = 0,
-        var userId: Int = 0,
+        var userId: Long = 0,
         var videoIds: Any? = Any(),
         var videos: Any? = Any()
     )
@@ -110,7 +110,7 @@ class FavoritesModel :FavoritesContract.FavoritesIModel{
         var province: Int = 0,
         var remarkName: Any? = Any(),
         var signature: String = "",
-        var userId: Int = 0,
+        var userId: Long = 0,
         var userType: Int = 0,
         var vipType: Int = 0
     )

@@ -15,13 +15,17 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 const val HeadShowName="UserHeadShow"
-const val MyLoginCathe="LoginResult"
+const val MyLoginCatheObjectFileName="LoginResult"
 const val BackGroundName="BackGround"
 class ByPhonePresenter (activity:LoginByPhoneActivity): ByPhoneContract.ByPhoneIPresenter{
         val TAG="ByPhonePresenter"
         var view=activity
         var model=ByPhoneModel()
+        //登陆按钮被点击
+        //只是实现了 用户名 电话号码 用户密码 用户头像 cookie的获取与缓存
+        //同时还改了一下登陆的状态
         override fun loginClicked(phoneNumber: String, passwordText: String) {
+                //进度条转起来
                 view.progressOn()
                 var url=model.login(phoneNumber,passwordText)
                 netThread.launch(Dispatchers.IO) {
@@ -30,12 +34,14 @@ class ByPhonePresenter (activity:LoginByPhoneActivity): ByPhoneContract.ByPhoneI
                                 loginResult=Gson().fromJson(respondBody,ByPhoneModel.LoginResult::class.java)
                                 //
                                 if (loginResult.code==200){
+                                        //下载头像
                                         downLoadImage(HeadShowName, loginResult.profile?.avatarUrl!!)
+                                        //下载背景
                                         downLoadImage(BackGroundName, loginResult.profile?.backgroundUrl!!)
-
+                                        //将用户的缓存数据通过文件流下载下来
                                         var mData=LoginCathe(File("$imagePath/$HeadShowName.jpg")
                                         , loginResult.profile?.nickname!!,phoneNumber,passwordText, File("$imagePath/$BackGroundName.jpg"), loginResult.cookie)
-                                        downLoadObjectFile(MyLoginCathe,mData)
+                                        downLoadObjectFile(MyLoginCatheObjectFileName,mData)
                                         Log.d(TAG, "loginClicked: LoginCathe下载完成")
                                 }
 
@@ -43,9 +49,12 @@ class ByPhonePresenter (activity:LoginByPhoneActivity): ByPhoneContract.ByPhoneI
                         }catch (e:Exception){
                                 Log.e(TAG, e.printStackTrace().toString(),e)
                         }
+                        //切线程到Main修改界面
                         withContext(Dispatchers.Main){
+                                //登陆成功了
                                 if (loginResult.code==200){
                                         view.sendToast("登陆成功")
+                                        //ProgressBar停下来
                                         view.progressOff()
 
                                         //退出activity
@@ -57,6 +66,8 @@ class ByPhonePresenter (activity:LoginByPhoneActivity): ByPhoneContract.ByPhoneI
                                                 UserPresenter(MainActivity.secondFragment).changeIconAndName(File("$imagePath/$HeadShowName.jpg")
                                                         ,nickname,phoneNumber,passwordText)
                                         }
+                                        //初始化歌单列表 还自动登陆欸
+                                        MainActivity.presenter.loginAuto()
                                 }
                                 //登陆失败
                                 else{
