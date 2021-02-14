@@ -52,4 +52,5 @@
     <string name="singer_name">歌手</string>
     <string name="back_content_description">返回</string>
     <string name="default_bottom_text_value" >音乐~</string>
+    <string name="default_description">暂无相关描述</string>
 </resources>

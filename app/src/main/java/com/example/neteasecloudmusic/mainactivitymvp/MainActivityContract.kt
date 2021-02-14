@@ -11,11 +11,11 @@ interface MainActivityContract {
     }
     interface MainActivityIView{
         fun initFragment()
+        fun loopToSongUi()
     }
     interface MainActivityPresenter{
         fun loginAuto()
         fun getBanner()
         fun onUnavailable()
-        fun addMusicService(musicService: MyMusicService)
     }
 }

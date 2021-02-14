@@ -1,42 +1,49 @@
 package com.example.neteasecloudmusic.favoriteslist.songui
 
+import android.content.ComponentName
+import android.content.ServiceConnection
+import android.os.IBinder
 import android.util.Log
 import android.view.View
 import android.widget.SeekBar
+import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.songs.Song
 import com.example.neteasecloudmusic.favoriteslist.songs.Songs
-import com.example.neteasecloudmusic.mytools.musicservice.MyMusicService
-import com.example.neteasecloudmusic.mytools.musicservice.ServiceSong
+import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.activity_song_ui.*
 import kotlinx.coroutines.*
 
 var songJob= Job()
 var songThread= CoroutineScope(songJob)
+
 class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
-        ,SeekBar.OnSeekBarChangeListener{
+        ,SeekBar.OnSeekBarChangeListener
+        ,ServiceConnection
+        ,View.OnClickListener{
     val TAG="SongPresenter"
     var view=activity
     var model=SongModel()
+
+
+
+
     //当出现上一首和下一首的情况就不用重新去请求数据了
-    private lateinit var songPlayList:MutableList<Song>
+    private lateinit var songPlayList:MutableList<ServiceSong>
     var position:Int=0
 
-    lateinit var song:Song
+    lateinit var song:ServiceSong
     lateinit var musicService: MyMusicService
-
-    fun addMusicService(musicService: MyMusicService){
-        this.musicService=musicService
-    }
 
     override fun pauseOrPlay(
         it: View?,
         song: Song,
         musicService: MyMusicService
     ) {
-        val isPlaying=musicService.getIsPlaying()
+        val isPlaying= getIsPlaying()
         //第一次播放 而且以前还没有播放过
-        if (!isPlaying && musicService.getCurrentPosition()==0){
+        if (!isPlaying && getCurrentPosition()==0){
             view.iconChangeToPlay()
             //获取网络请求的发送地址
             //////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +54,7 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
             //同步一下进度条 可能存在 退出和没退出播放两种情况
             //musicService.beginToRefreshBar()
             //1 播放id相同 -> 暂停
-            if (this.song.songId==musicService.getMySongId()){
+            if (this.song.songId== getMySongId()){
                 //暂停音乐
                 musicService.pauseMusic()
                 //同步bar最大值
@@ -67,7 +74,7 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
             }
         }
         //播放了没有退出 暂停状态
-        else if (musicService.getCurrentPosition()!=0){
+        else if (getCurrentPosition()!=0){
             view.iconChangeToPlay()
             //musicService.startMusic(this.song.songId)
         }
@@ -139,13 +146,13 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
             this.song=songPlayList[position]
         }
         //还可能当前正在播放或者没有在播放
-        if (musicService.getCurrentPosition()!=0){
+        if (getCurrentPosition()!=0){
             //正在播先停掉
             musicService.resetMusic()
         }
         //初始化播放布局
         //ok地址和歌曲信息给view了
-        view.initView(this.song, this.position, Songs(songPlayList))
+       // view.initView(this.song, this.position, Songs(songPlayList))
         //播放歌曲
         playMusic(this.song.songId)
         //播放按键变一下
@@ -170,48 +177,51 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
             this.song=songPlayList[position]
         }
         //还可能当前正在播放或者没有在播放
-        if (musicService.getCurrentPosition()!=0){
+        if (getCurrentPosition()!=0){
             //正在播先停掉
             musicService.resetMusic()
         }
         //初始化播放布局
         //ok地址和歌曲信息给view了
-        view.initView(this.song, this.position, Songs(songPlayList))
+//        view.initView(this.song, this.position, Songs(songPlayList))
         //播放歌曲
         playMusic(this.song.songId)
         //播放按键变一下
         view.iconChangeToPlay()
     }
-    //当点开Activity的时候
+
     override fun initView(songList: MutableList<Song>, position: Int?) {
-        //初始化
-        this.position=position!!
-        this.songPlayList=songList
-        this.song=songList[position]
-        //1 现在处于 播放状态
-        if (musicService.getIsPlaying()){
-            // 1 播放id与现在activity的id是一致的
-            if (musicService.getMySongId()==view.song.songId){
-                //设置progressbar和SeekBar的最大值
-                view.setMusicMaxProgress(musicService.getDuration())
-                //设置button
-                view.iconChangeToPlay()
-            }
-            //2 当id与现在activity不一致
-            else{
-                //不管就默认
-            }
-        }
-        //2 现在处于 未播放状态
-        else{
-            //播放过 而且退出了 重新进入界面时的情况
-            if (musicService.getCurrentPosition()!=0 && musicService.getMySongId()==song.songId){
-                view.setMusicMaxProgress(musicService.getDuration())
-                view.setCurrentSeekBarProgressTo(musicService.getCurrentPosition())
-                view.setCurrentTextProgressTo(musicService.getCurrentPosition())
-            }
-        }
     }
+    //当点开Activity的时候
+//    override fun initView(songList: MutableList<Song>, position: Int?) {
+//        //初始化
+//        this.position=position!!
+//        this.songPlayList=songList
+//        this.song=songList[position]
+//        //1 现在处于 播放状态
+//        if (getIsPlaying()){
+//            // 1 播放id与现在activity的id是一致的
+//            if (getMySongId()==view.song.songId){
+//                //设置progressbar和SeekBar的最大值
+//                view.setMusicMaxProgress(getDuration())
+//                //设置button
+//                view.iconChangeToPlay()
+//            }
+//            //2 当id与现在activity不一致
+//            else{
+//                //不管就默认
+//            }
+//        }
+//        //2 现在处于 未播放状态
+//        else{
+//            //播放过 而且退出了 重新进入界面时的情况
+//            if (getCurrentPosition()!=0 && getMySongId()==song.songId){
+//                view.setMusicMaxProgress(getDuration())
+////                view.setCurrentSeekBarProgressTo(getCurrentPosition())
+////                view.setCurrentTextProgressTo(getCurrentPosition())
+//            }
+//        }
+//    }
 
     override fun onMusicCompletion() {
 
@@ -219,7 +229,7 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
 
     //SeekBar的监听
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        view.setCurrentTextProgressTo(progress)
+//        view.setCurrentTextProgressTo(progress)
     }
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
 
@@ -227,14 +237,18 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
         //第一次使用
-        if (!musicService.getIsPlaying() && musicService.getCurrentPosition()==0){
-            playMusic(song.songId)
-            view.iconChangeToPlay()
+        if (!getIsPlaying()&& getCurrentPosition()==0){
+            try {
+                musicService.playMusic(songPlayList,position)
+                view.iconChangeToPlay()
+            }catch (e:java.lang.Exception){
+                view.sendToast("快去寻找音乐吧~")
+            }
         }
         //之前播放过
-        else if (musicService.getCurrentPosition()!=0){
+        else if (getCurrentPosition()!=0){
             //如果播放的歌曲匹配
-            if (this.song.songId==musicService.getMySongId()){
+            if (this.song.songId== getMySongId()){
                 //当停止滑动的时候 把音乐拖动播放到指定位置处
                 musicService.seekMusicTo(seekBar?.progress!!)
             }
@@ -242,14 +256,78 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
             else{
                 //占据该音乐的播放
                 musicService.resetMusic()
-                playMusic(this.song.songId)
+                //playMusic(getSongList(), getPosition())
+                musicService.playMusic(songPlayList,position)
             }
         }
     }
 
 
-//    suspend fun getSong(url:String):ServiceSong{
-//        var respondBody= sendGetRequest(url)
-//
-//    }
+
+
+
+    //连接不成功
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Log.e("TAG", "音乐服务连接失败")
+    }
+
+
+
+    //连接成功
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Log.e(TAG, "音乐服务连接成功" )
+        musicService=(service as MyMusicService.MyBinder ).getService()
+        //设置musicService
+        musicService.addBindView(view)
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id){
+           R.id.song_ui_back_icon->{
+                view.back()
+            }
+            R.id.play_pause_icon->{
+                //当没有播放过
+                if (getCurrentPosition()==0){
+                    try {
+                        musicService.playMusic(songPlayList,position)
+                    }catch (e:java.lang.Exception){
+                        view.sendToast("快去寻找音乐吧~")
+                    }
+                }
+                //当播放过
+                else{
+                    if (getIsPlaying()){
+                        musicService.pauseMusic()
+                        view.iconChangeToPause()
+                    }else{
+                        musicService.pauseToStart()
+                        view.iconChangeToPlay()
+                    }
+                }
+            }
+            R.id.the_next_song_icon->{
+                if (getSongList()!=null){
+                    musicService.playNextSong()
+                }else{
+                    view.sendToast("暂无音乐播放列表~")
+                }
+            }
+            R.id.the_last_song_icon->{
+                if (getSongList()!=null){
+                    musicService.playLastSong()
+                }else{
+                    view.sendToast("暂无音乐播放列表~")
+                }
+            }
+
+        }
+    }
+
+    fun addData(songs: MutableList<ServiceSong>, position: Int) {
+        this.songPlayList=songs
+        this.position=position
+        this.song=songPlayList[position]
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.userfragmentmvp
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.view.View
 import java.io.File
@@ -9,7 +10,7 @@ interface UserContract {
         fun initIconAndName(icon: File?, name: String?)
         fun changeUserTitle(username: String?, userIconUrl: File?)
         fun initView()
-        fun favoritesClicked(v: View, position: Int)
+        fun favoritesClicked(v: View, position: Int, intent: Intent)
     }
 
     interface UserIModel{

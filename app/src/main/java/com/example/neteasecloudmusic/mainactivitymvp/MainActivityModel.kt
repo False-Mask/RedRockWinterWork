@@ -78,7 +78,7 @@ class Playlist {
     var coverImgUrl: String = ""
     var createTime: Long = 0
     var creator: Creator = Creator()
-    var description: Any? = Any()
+    var description: String? = ""
     var englishTitle: Any? = Any()
     var highQuality: Boolean = false
     var id: Long = 0
@@ -182,7 +182,7 @@ data class Banner(
     var showAdTag: Boolean = false,
     var showContext: Any? = Any(),
     var song: Any? = Any(),
-    var targetId: Int = 0,
+    var targetId: Long = 0,
     var targetType: Int = 0,
     var titleColor: String = "",
     var typeTitle: String = "",

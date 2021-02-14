@@ -1,13 +1,17 @@
 package com.example.neteasecloudmusic.userfragmentmvp
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.example.neteasecloudmusic.context
+import com.example.neteasecloudmusic.favoriteslist.FavoritesActivity
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.HeadShowName
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.LoginCathe
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.MyLoginCatheObjectFileName
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.loginResult
+import com.example.neteasecloudmusic.mainactivitymvp.playListResult
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.mContext
 import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
@@ -18,8 +22,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+
 var loginCathe:LoginCathe?=null
-class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter{
+class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter
+{
     //供给其他Presenter调用
     var USER_BASIC_SP_NAME= UserFragment.USER_BASIC_SP_NAME
     val TAG="UserPresenter"
@@ -33,7 +39,7 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter{
 
     //保存用户数据后 用户进行登陆
     override fun initView(sp: SharedPreferences) {
-        var isLogin=sp.getBoolean("is_login",false)
+        val isLogin=sp.getBoolean("is_login",false)
         if (isLogin){
             Log.d(TAG, "initView: 读取本地的用户缓存信息")
             var bool1:Boolean=false
@@ -76,7 +82,27 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter{
     }
     //Rv被点击了
     override fun rvItemClicked(v: View, position: Int) {
-        view.favoritesClicked(v,position)
+        val intent=Intent(context,FavoritesActivity::class.java)
+        var x=playListResult?.playlist?.get(position)
+        x?.apply {
+            intent.putExtra("position",position)
+            //创建者的头像
+            intent.putExtra("avatarUrl",creator?.avatarUrl)
+            //名称
+            intent.putExtra("nickname",creator?.nickname)
+            //name
+            intent.putExtra("name",name)
+            //描述
+            intent.putExtra("description",description)
+            //id
+            intent.putExtra("playListId",id.toString())
+            //是否利用本地缓存
+            intent.putExtra("useLocalCathe",false)
+
+            intent.putExtra("coverImgUrl",coverImgUrl)
+
+        }
+        view.favoritesClicked(v,position,intent)
         MyToast().sendToast(mContext,"${position}被点击",Toast.LENGTH_SHORT)
     }
 }

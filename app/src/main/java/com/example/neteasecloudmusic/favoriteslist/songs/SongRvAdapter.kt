@@ -1,6 +1,5 @@
 package com.example.neteasecloudmusic.favoriteslist.songs
 
-import android.app.Service
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,14 +14,16 @@ import com.example.neteasecloudmusic.favoriteslist.playListDetailsResult
 import com.example.neteasecloudmusic.mytools.musicservice.ServiceSong
 import kotlinx.android.synthetic.main.rv_song_first.view.*
 import kotlinx.android.synthetic.main.rv_song_list_item.view.*
-import java.net.ServerSocket
-import kotlin.concurrent.fixedRateTimer
+
+private var titleView:View?=null
+private var songView:View?=null
+private var lastView:View?=null
 
 var songList: MutableList<Song> = mutableListOf()
 private var netSongList:MutableList<ServiceSong> = mutableListOf()
 class SongRvAdapter : RecyclerView.Adapter<SongRvAdapter.Holder>() {
     lateinit var view: View
-
+    var titleData:SongTitle?=null
     //必须初始化
     lateinit var listener: OnClickListener
 
@@ -39,35 +40,48 @@ class SongRvAdapter : RecyclerView.Adapter<SongRvAdapter.Holder>() {
         var favoritesName:TextView?=null
         var creatorHeadShows:ImageView?=null
         var briefIntroduction:TextView?=null
+        var nickName:TextView?=null
         init {
             //不知道为啥貌似每一个布局都会进入
             //而且一旦出现空就会报错
             try {
+                if (titleView==itemView){
+                    favoritesImage=itemView.favorite_image
+                    favoritesName=itemView.favorite_name
+                    creatorHeadShows=itemView.song_list_head_show
+                    briefIntroduction=itemView.brief_introduction
+                    nickName=itemView.song_list_user_name
+                }else if (songView==itemView){
+                    songPosition = itemView.song_position
+                    singerName=itemView.singer_name
+                    songName=itemView.song_name
+                }
                 //歌词面板
                 view=itemView
-                songPosition = itemView.song_position
-                singerName=itemView.singer_name
-                songName=itemView.song_name
             }catch (e:Exception){
                 Log.e("Holder", "未初始化异常 ", e)
                 //首item面板
-                favoritesImage=itemView.favorite_image
-                favoritesName=itemView.favorite_name
-                creatorHeadShows=itemView.song_list_head_show
-                briefIntroduction=itemView.brief_introduction
             }
         }
 
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         view = when (viewType) {
             //歌曲面板
-            MyViewType.SongView.ordinal -> LayoutInflater.from(parent.context).inflate(R.layout.rv_song_list_item, parent, false)
+            MyViewType.SongView.ordinal -> {
+                songView=LayoutInflater.from(parent.context).inflate(R.layout.rv_song_list_item, parent, false)
+                songView!!
+            }
             //首页
-            MyViewType.FirstView.ordinal -> LayoutInflater.from(parent.context).inflate(R.layout.rv_song_first, parent, false)
+            MyViewType.FirstView.ordinal -> {
+                titleView=LayoutInflater.from(parent.context).inflate(R.layout.rv_song_first, parent, false)
+                titleView!!
+            }
             //最后一页
-            else -> LayoutInflater.from(parent.context).inflate(R.layout.rv_song_last, parent, false)
+            else ->{
+                lastView=LayoutInflater.from(parent.context).inflate(R.layout.rv_song_last, parent, false)
+                lastView!!
+            }
         }
         return Holder(view)
     }
@@ -145,6 +159,17 @@ class SongRvAdapter : RecyclerView.Adapter<SongRvAdapter.Holder>() {
                     holder.view?.setOnClickListener {
                         listener.titleClicked(view)
                     }
+                    try {
+                        Glide.with(view).load(titleData?.avatarUrl).into(titleView?.song_list_head_show!!)
+                        Glide.with(view).load(titleData?.coverImgUrl).into(titleView?.favorite_image!!)
+                        if(titleData?.description!=""){
+                            titleView!!.brief_introduction.text=titleData?.description
+                        }
+                        titleView!!.song_list_user_name.text=titleData?.nickname
+                        titleView!!.favorite_name.text=titleData?.name
+                    }catch (e:java.lang.Exception){
+                        Log.e("UserPresenter", "rv title加载故障",e )
+                    }
                 }
                 //最后的项目
                 netSongList.size - 1-> {
@@ -193,6 +218,10 @@ class SongRvAdapter : RecyclerView.Adapter<SongRvAdapter.Holder>() {
     //添加Click的接口回调
     fun setOnItemClickListener(mListener: OnClickListener) {
         this.listener = mListener
+    }
+
+    fun addTitleData(songTitle: SongTitle) {
+        this.titleData=songTitle
     }
 
     interface OnClickListener {

@@ -16,25 +16,58 @@ import kotlinx.coroutines.Dispatchers.Main
 import java.io.Serializable
 
 //刷新音乐的协程
+private var musicService=MyMusicService()
 var MusicRefreshJob= Job()
 var MusicRefreshThread= CoroutineScope(MusicRefreshJob)
+private var songUiList= mutableListOf<IServiceBindView>()
+private var position:Int=0
+private var songList:MutableList<ServiceSong>?=null
+private var song:ServiceSong?=null
+
+fun getSongList(): MutableList<ServiceSong>? {
+    return songList
+}
+fun getSong(): ServiceSong? {
+    return song
+}
+fun getPosition(): Int {
+    return position
+}
+
+fun addView(view:IServiceBindView){
+    songUiList.add(view)
+}
+fun reMoveView(view: IServiceBindView){
+    songUiList.remove(view)
+}
+
+//获取一些MediaPlayer基本属性
+fun getIsPlaying(): Boolean {
+    return mediaPlayer.isPlaying
+}
+fun getIsLooping(): Boolean {
+    return mediaPlayer.isLooping
+}
+fun getDuration(): Int {
+    return mediaPlayer.duration
+}
+fun getCurrentPosition(): Int {
+    return mediaPlayer.currentPosition
+}
+
+fun getMySongId(): String {
+    return MySongId
+}
 
 //顶层方法 主要是告诉Service View还活着没 死了就不要调用刷新他丫的视图
 //免得闪退
-fun setViewStatus(boolean: Boolean){
-    isViewAlive=boolean
-}
 
 //存放一个歌曲的id这样就可以时刻知道正在播放
 private var MySongId="NULL"
 
-//绑定的view是否还活着
-private var isViewAlive = false
-
 //单例了 免得到时候 重复播放
 private val mediaPlayer:MediaPlayer= MediaPlayer()
 
-private val bindViewList= mutableListOf<IServiceBindView>()
 class MyMusicService : Service()
         //出错的监听                    //缓冲监听
         , MediaPlayer.OnErrorListener, MediaPlayer.OnBufferingUpdateListener
@@ -51,20 +84,18 @@ class MyMusicService : Service()
     //变量
     val TAG="MyMusicService"
 
-    private var position:Int=0
-
-    private val binder=MyBinder()
+    private val binder=MyBinder
 
     //外部加入的song
-    private var songList:MutableList<ServiceSong>?=null
-
-    private var song:ServiceSong?=null
+//    private var songList:MutableList<ServiceSong>?=null
+//
+//    private var song:ServiceSong?=null
     //绑定的songPre
 
     private lateinit var songPre: IServiceBindPresenter
 
 
-    private lateinit var songUi:IServiceBindView
+    var songUi:IServiceBindView?=null
 
     //service放回的给view的data
 
@@ -108,9 +139,12 @@ class MyMusicService : Service()
 
     //Binder可以看成是服务和用户的连接
     //他实现了IBinder 可以通过强转得到IBinder
-    inner class MyBinder: Binder() {
+
+    //确保从始至终只有一个service的实例服务activity
+    //这里通过单例实现了musicService的单例(防止重复播放)
+    object MyBinder: Binder() {
         fun getService(): MyMusicService {
-            return this@MyMusicService
+            return musicService
         }
     }
 
@@ -118,33 +152,19 @@ class MyMusicService : Service()
         Loopering,PlayInOrderNext,PlayInOrderLast
     }
 
-    /////////////////////////////////////////////////////////////////
     //添加绑定的视图
     fun addBindView(songUiActivity:IServiceBindView){
         this.songUi=songUiActivity
-        bindViewList.add(songUiActivity)
     }
 
     fun addBindPresenter(songPresenter:IServiceBindPresenter){
         this.songPre=songPresenter
     }
 
-    //获取一些MediaPlayer基本属性
-    fun getIsPlaying(): Boolean {
-        return mediaPlayer.isPlaying
-    }
-    fun getIsLooping(): Boolean {
-        return mediaPlayer.isLooping
-    }
-    fun getDuration(): Int {
-        return mediaPlayer.duration
-    }
-    fun getCurrentPosition(): Int {
-        return mediaPlayer.currentPosition
-    }
-
-    fun getMySongId(): String {
-        return MySongId
+    fun doForAll(block:IServiceBindView.()->Unit){
+        for (x in songUiList){
+            x.block()
+        }
     }
 
     //发送并获取网络歌曲的url
@@ -206,11 +226,7 @@ class MyMusicService : Service()
             //开始刷新 每1秒刷新一次
             //允许刷新
             doRefreshing=true
-
-            //view还活着就调用刷新
-            if (isViewAlive){
-                refreshMusicPlayerStatus()
-            }
+            refreshMusicPlayerStatus()
         }
     }
     //start
@@ -219,36 +235,43 @@ class MyMusicService : Service()
     }
 
     //根据songId播放音乐 播放单曲不具有 自动切换下一曲的功能
-    fun playMusic(song: ServiceSong) {
+    fun playMusic(msong: ServiceSong) {
         //自动初始song
-        this.song=song
+        song=msong
         //同步当前播放的id
-        MySongId=song.songId
-        val url1=baseUrl+url+song.songId
+        MySongId= msong.songId
+        val url1=baseUrl+url+msong.songId
         songThread.launch (IO){
             //获取音乐的信息
             val songUrl= getMusicUrl(url1)
             //播放网络url 3种情况的处理
             serviceData= ServiceBackData()
             serviceData.apply {
-                Imageurl= song.image
-                this.songId= song.songId
-                singer= song.artist
-                songName= song.songName
+                Imageurl= msong.image
+                this.songId= msong.songId
+                singer= msong.artist
+                songName= msong.songName
             }
             when(songUrl){
                 // 1 没有找到资源
                 "NULL"-> withContext(Main){
-                    songUi.sendToast("未找到该资源")
+                    //songUi?.sendToast("未找到该资源")
                     //把图标变回来
-                    songUi.iconChangeToPause()
+                    //songUi?.iconChangeToPause()
+                    doForAll {
+                        sendToast("未找到该资源")
+                        iconChangeToPause()
+                    }
                     comeAcrossError()
                 }
                 // 2 解码错误
                 "ERRO"-> withContext(Main){
-                    songUi.sendToast("音乐解码错误")
+                    //songUi?.sendToast("音乐解码错误")
                     //把图标变回来
-                    songUi.iconChangeToPause()
+                    //songUi?.iconChangeToPause()
+                    doForAll {
+                        iconChangeToPause()
+                    }
                     comeAcrossError()
                 }
                 // 3 成功
@@ -263,27 +286,38 @@ class MyMusicService : Service()
     }
 
     //自动关联list播放完以后自动依照模式播放
-    fun playMusic(songList: MutableList<ServiceSong>, position: Int){
-        this.songList=songList
-        this.position=position
-        playMusic(songList[position])
+    fun playMusic(msongList: MutableList<ServiceSong>?, mposition: Int){
+        songList=msongList
+        position=mposition
+        playMusic(msongList!![mposition])
     }
 
 
     private fun refreshMusicPlayerStatus() {
         if (!isRefreshing){
             MusicRefreshThread.launch (IO){
-                while (doRefreshing){
-                    isRefreshing=true
+
+                Log.e(TAG, "${Thread.currentThread()}"+"while 外部")
+                isRefreshing=true
+
+                while (true){
+                    Log.e(TAG, "${Thread.currentThread()}"+"while 内部")
+                    if (!doRefreshing){
+                        break
+                    }
                     //每一秒刷新一下
                     delay(1000)
-                    withContext(Main){
-                        songUi.serviceRefresh  (serviceData.songName,
-                                serviceData.singer,
-                                serviceData.Imageurl,
-                                getDuration(),
-                                getCurrentPosition(),
-                                serviceData.songId)
+                    if (doRefreshing){
+                        withContext(Main){
+                            doForAll {
+                                serviceRefresh  (serviceData.songName,
+                                        serviceData.singer,
+                                        serviceData.Imageurl,
+                                        getDuration(),
+                                        getCurrentPosition(),
+                                        serviceData.songId)
+                            }
+                        }
                     }
                 }
                 isRefreshing=false
@@ -339,7 +373,7 @@ class MyMusicService : Service()
 
     //缓存更新的时候回调
     override fun onBufferingUpdate(mp: MediaPlayer?, percent: Int) {
-        songUi.setBufferedProgress(percent)
+        songUi?.setBufferedProgress(percent)
     }
     override fun onCompletion(mp: MediaPlayer?) {
         //音乐播放完成
@@ -354,14 +388,14 @@ class MyMusicService : Service()
         }
     }
 
-    private fun playLoop() {
+    fun playLoop() {
         if (song!=null){
             playMusic(song!!)
         }
     }
 
     //播放下一首
-    private fun playLastSong() {
+    fun playLastSong() {
         if(songList!=null){
             if (position==0){
                 position=songList!!.size-1
@@ -377,7 +411,7 @@ class MyMusicService : Service()
     }
 
     //播放下一首
-    private fun playNextSong() {
+    fun playNextSong() {
         if (songList!=null){
             if(position<songList!!.size-1){
                 position++
@@ -396,16 +430,20 @@ class MyMusicService : Service()
 
     //准备完成的回调
     override fun onPrepared(mp: MediaPlayer?) {
+
         startMusic()
-        if(isViewAlive){
-            //设置进度条
-            songUi.setMusicMaxProgress(mediaPlayer.duration)
+        doForAll {
+            setMusicMaxProgress(getDuration())
         }
     }
 
     //拖动完成
     override fun onSeekComplete(mp: MediaPlayer?) {
         songPre.onMusicSeekComplete(mp)
+    }
+
+    fun reMoveView() {
+        songUi= null
     }
 
     //返回的数据
@@ -431,6 +469,13 @@ data class ServiceSong(var artist:String="",
     }
 }
 
+data class ServiceSongList(
+        var mSongs:MutableList<ServiceSong>
+):Serializable{
+    companion object{
+        const val serialVersionUID = 1001L
+    }
+}
 //歌曲的详细信息
 data class SongData(
         var code: Int = 0,

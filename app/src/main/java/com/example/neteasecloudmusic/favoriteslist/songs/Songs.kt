@@ -12,6 +12,14 @@ data class Song(var artist:String="",
     }
 }
 
+data class SongTitle(
+        var avatarUrl: String? ="",
+        var nickname: String? ="",
+        var name: String? ="",
+        var description: String? ="",
+        var coverImgUrl: String? =""
+)
+
 data class Songs(
         var songs:MutableList<Song> = mutableListOf()
 ):Serializable{

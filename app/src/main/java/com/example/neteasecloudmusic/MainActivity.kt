@@ -1,38 +1,40 @@
 package com.example.neteasecloudmusic
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkRequest
-import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
+import com.bumptech.glide.Glide
+import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
 import com.example.neteasecloudmusic.firstpagefragmentmvp.FirstFragment
-import com.example.neteasecloudmusic.mainactivitymvp.BannerDataObjectName
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityPresenter
-import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
+import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netJob
 import com.example.neteasecloudmusic.mytools.toast.MyToast
-import com.example.neteasecloudmusic.myview.BannerData
-import com.example.neteasecloudmusic.myview.viewList
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.pagerview.view.*
-import java.io.File
+import kotlinx.android.synthetic.main.rv_song_first.*
+import kotlinx.android.synthetic.main.second_fragment_layout.*
 import kotlinx.android.synthetic.main.activity_main.user_text as user_text1
 
 //NetWorkChangeImp是网络变化的监听
 var context:MainActivity?=null
 class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView
-        ,NetWorkChangeImp.NetCallback {
+        ,NetWorkChangeImp.NetCallback, IServiceBindView {
     //网络连接管理器
     private lateinit var connectivityManager:ConnectivityManager
     //连接变化的实现类
     private var myListener=NetWorkChangeImp
+
+    private lateinit var connection:ServiceConnection
 
     val TAG="MainActivity"
     //初始化presenter
@@ -48,15 +50,26 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //
+        //初始化connection和presenter
         presenter=MainActivityPresenter(this)
+        connection= presenter
         //程序开始 初始化View视图
         initFragment()
         //注册网络连接变化的监听
+        //初始化点击事件的处理
+        initClick()
         registerNetListener()
         //添加监听器
         NetWorkChangeImp.addListener(this)
         context=this
+    }
+
+    private fun initClick() {
+        bottom_play_pause_main.setOnClickListener(presenter)
+        bottom_song_image_main.setOnClickListener(presenter)
+        bottom_song_name_main.setOnClickListener(presenter)
+        bottom_next_song.setOnClickListener(presenter)
+        bottom_last_song.setOnClickListener(presenter)
     }
 
     //activity销毁的时候取消job以免发生内存泄漏
@@ -80,6 +93,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         music_text.setTextColor(Color.BLACK)
         bottom_user.setImageResource(R.drawable.user_icon_1)
         bottom_music.setImageResource(R.drawable.music_icon_1)
+
 
         val manager=supportFragmentManager
         val transaction=manager.beginTransaction()
@@ -132,6 +146,11 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         transaction.commit()
         //window
     }
+//跳转至 songUiActivity
+    override fun loopToSongUi() {
+        val intent=Intent(this,SongUiActivity::class.java)
+        startActivity(intent)
+    }
 
 
     //隐藏所有的Fragment
@@ -140,6 +159,50 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     private fun hideAll(transaction:FragmentTransaction) {
         transaction.hide(firstFragment)
         transaction.hide(secondFragment)
+    }
+
+
+    //绑定布局
+    override fun onStart() {
+        super.onStart()
+        val intent=Intent(this,MyMusicService::class.java)
+        bindService(intent,connection, Context.BIND_AUTO_CREATE)
+        addView(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        //移除免得调用
+        presenter.musicService.reMoveView()
+        unbindService(connection)
+        Log.d(TAG, "断开连接")
+        reMoveView(this)
+    }
+
+    //service的接口
+    override fun serviceRefresh(songName: String, singer: String, imageUrl: String, duration: Int, currentTime: Int, songId: String) {
+        if (getIsPlaying()){
+            bottom_play_pause_main.setImageResource(R.drawable.play)
+        }else{
+            bottom_play_pause_main.setImageResource(R.drawable.pause)
+        }
+        Glide.with(this).load(imageUrl).into(bottom_song_image_main)
+        bottom_song_name_main.text=songName
+    }
+
+    override fun setMusicMaxProgress(duration: Int) {
+
+    }
+
+    override fun sendToast(s: String) {
+        MyToast().sendToast(this,s,Toast.LENGTH_SHORT)
+    }
+
+    override fun iconChangeToPause() {
+    }
+
+    override fun setBufferedProgress(percent: Int) {
+
     }
 
 

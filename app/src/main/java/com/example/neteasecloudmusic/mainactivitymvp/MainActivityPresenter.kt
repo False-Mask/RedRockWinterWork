@@ -1,17 +1,27 @@
 package com.example.neteasecloudmusic.mainactivitymvp
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.ServiceConnection
+import android.media.MediaPlayer
+import android.os.IBinder
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.MyApplication
+import com.example.neteasecloudmusic.R
+import com.example.neteasecloudmusic.favoriteslist.songs.songList
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.ByPhoneModel
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.loginResult
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadObjectFile
 import com.example.neteasecloudmusic.mytools.filedownload.imagePath
 import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
+import com.example.neteasecloudmusic.mytools.musicservice.IServiceBindPresenter
 import com.example.neteasecloudmusic.mytools.musicservice.MyMusicService
+import com.example.neteasecloudmusic.mytools.musicservice.getIsPlaying
+import com.example.neteasecloudmusic.mytools.musicservice.getMySongId
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
@@ -22,6 +32,7 @@ import com.example.neteasecloudmusic.recyclerview.favorites.list
 import com.example.neteasecloudmusic.userfragmentmvp.rvAdapter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -32,10 +43,40 @@ const val BaseFavoritesFileName="Favorites"
 const val FavoritesObjectFilesName="FavoritesObject"
 const val BannerDataObjectName="BannerData"
 const val BaseBannerImageFileName="banner"
-class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainActivityPresenter {
+class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainActivityPresenter
+        , IServiceBindPresenter,ServiceConnection
+        ,View.OnClickListener{
+
     val TAG = "MainActivityPresenter"
     var view = activity
     var model = MainActivityModel()
+
+    lateinit var musicService:MyMusicService
+
+    //Service的接口
+    override fun onMusicCompletion() {
+
+    }
+
+    override fun onMusicStart() {
+    }
+
+    override fun onMusicSeekComplete(mp: MediaPlayer?) {
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        Log.e(TAG, "连接失败" )
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        Log.e(TAG, "连接成功" )
+        musicService=(service as MyMusicService.MyBinder).getService()
+        musicService.addBindView(view)
+        musicService.addBindPresenter(this)
+    }
+
+
+
 
     //下载了歌单的封面和rv的更新 自动登陆
     override fun loginAuto() {
@@ -47,20 +88,20 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
                 withContext(Dispatchers.IO) {
                     //io 登陆
                     try {
-                        var resultBody = sendGetRequest(model.getLoginUrl())
+                        val resultBody = sendGetRequest(model.getLoginUrl())
                         Log.d(TAG, "loginAuto: ")
                         loginResult = Gson().fromJson(resultBody, object : TypeToken<ByPhoneModel.LoginResult>() {}.type)
                     } catch (e: Exception) { }
                     //io第二条 获取用户的歌单信息(不是详细信息)
                     try {
-                        var resultBody =  sendGetRequest(model.playList())
+                        val resultBody =  sendGetRequest(model.playList())
                         playListResult = Gson().fromJson<MainActivityModel.PlayListResult>(resultBody, object : TypeToken<MainActivityModel.PlayListResult>() {}.type)
                         Log.e(TAG, "loginAuto: ")
                     } catch (e: Exception) { }
 
                     //从sp中找找看歌单封面图片下载了没
                     try {
-                        var favorites=readObjectFile(FavoritesObjectFilesName) as MutableList<Favorites>
+                        val favorites=readObjectFile(FavoritesObjectFilesName) as MutableList<Favorites>
                         for (x in favorites){
                             if (!x.images.exists()) {
                                 mainActivitySp.put {
@@ -72,9 +113,9 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
                         Log.e(TAG, "loginAuto: 读取歌单object文件出现异常",e)
                     }
 
-                    var isPictureExists=mainActivitySp.getBoolean("is_picture_exists", false)
+                    val isPictureExists=mainActivitySp.getBoolean("is_picture_exists", false)
                     //获取需要下载歌单封面的个数
-                    var count=playListResult.playlist?.size?:0
+                    val count=playListResult.playlist?.size?:0
                     //没有下载
                     if (!isPictureExists){
                         if (count!=0){
@@ -165,7 +206,21 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
 
     }
 
-    override fun addMusicService(musicService: MyMusicService) {
-
+    override fun onClick(v: View?) {
+        when(v?.id){
+            //播放暂停键被点击
+            R.id.bottom_play_pause_main->{
+                if (getIsPlaying()){
+                    musicService.pauseMusic()
+                }else{
+                    musicService.pauseToStart()
+                }
+            }
+            //当bottom的图片或者文字被点击 -> 跳转到songUI界面
+            R.id.bottom_song_name_main,R.id.bottom_song_image_main
+                ->{
+                view.loopToSongUi()
+            }
+        }
     }
 }

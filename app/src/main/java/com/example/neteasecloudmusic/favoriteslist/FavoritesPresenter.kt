@@ -1,30 +1,28 @@
 package com.example.neteasecloudmusic.favoriteslist
 
 import android.content.ComponentName
+import android.content.Intent
 import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
 import android.view.View
-import com.example.neteasecloudmusic.MainActivity.MyFragment.presenter
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.songs.Song
 import com.example.neteasecloudmusic.favoriteslist.songs.SongRvAdapter
-import com.example.neteasecloudmusic.favoriteslist.songs.songList
+import com.example.neteasecloudmusic.favoriteslist.songs.SongTitle
+import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
 import com.example.neteasecloudmusic.mainactivitymvp.mainActivitySp
 import com.example.neteasecloudmusic.mainactivitymvp.playListResult
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadObjectFile
 import com.example.neteasecloudmusic.mytools.filedownload.imagePath
 import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
-import com.example.neteasecloudmusic.mytools.musicservice.IServiceBindPresenter
-import com.example.neteasecloudmusic.mytools.musicservice.MyMusicService
-import com.example.neteasecloudmusic.mytools.musicservice.ServiceSong
+import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_favorites.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -37,7 +35,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
 ,SongRvAdapter.OnClickListener
 ,ServiceConnection
 ,IServiceBindPresenter
-,View.OnClickListener{
+,View.OnClickListener {
     val TAG = "FavoritesPresenter"
 
     //获取song的详细信息
@@ -57,7 +55,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                 val url = model.getSongs(favoriteId)
                 var mSongList = mutableListOf<Song>()
                 //挂起防止歌单内的歌曲数目过多导致Main线程卡顿
-                netThread.launch(Dispatchers.IO) {
+                netThread.launch(IO) {
                     try {
                         //加上position区分不同的歌单
                         mSongList = readObjectFile(SongsObjectFileName + position) as MutableList<Song>
@@ -113,8 +111,14 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
         }
 
         //直接获取
-        override fun getPlayList(playListId: String, songRvAdapter: SongRvAdapter) {
+        override fun getPlayList(playListId: String, songRvAdapter: SongRvAdapter, intent: Intent) {
             view.progressBarOn()
+            val avatarUrl=intent.extras?.getString("avatarUrl")
+            val nickname=intent.extras?.getString("nickname")
+            val name=intent.extras?.getString("name")
+            val description=intent.extras?.getString("description")
+            val coverImgUrl=intent.extras?.getString("coverImgUrl")
+            songRvAdapter.addTitleData(SongTitle(avatarUrl,nickname,name,description,coverImgUrl))
             netThread.launch(IO) {
                 //网络请求
                 val url = model.getSongs(playListId)
@@ -241,7 +245,6 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
 
         //音乐被点击了
        override fun itemClicked(position: Int) {
-
         }
 
 
@@ -259,9 +262,9 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
 //            }
             val clickId=listSong[position-1].songId
             //正在播放音乐
-            if (musicService.getIsPlaying()){
+            if (getIsPlaying()){
                 //播放的同一首暂停
-                if (clickId==musicService.getMySongId()){
+                if (clickId== getMySongId()){
                     musicService.pauseMusic()
                 }
                 //否者重新播放
@@ -273,7 +276,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
             //没有播放音乐
             else{
                 //播放后暂停
-                if (musicService.getCurrentPosition()!=0){
+                if (getCurrentPosition()>0){
                     musicService.pauseToStart()
                 }
                 //单纯的没播放 那就开始播放
@@ -308,12 +311,10 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
     //连接成功
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Log.e(TAG, "音乐服务连接成功")
+
         musicService = (service as MyMusicService.MyBinder).getService()
         //添加到视图里面
-        musicService.addBindView(view)
-
-        //设置musicService
-        presenter.addMusicService(musicService)
+        //musicService.addBindView(view)
 
         Log.d(TAG, "onServiceConnected: " + musicService)
     }
@@ -333,13 +334,26 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
     override fun onClick(v: View?) {
         when(v?.id){
             R.id.bottom_pause_or_play->{
-                if (musicService.getIsPlaying()){
-                    musicService.pauseMusic()
-                }else{
-                    musicService.pauseToStart()
+                //之前有过播放
+                if(getCurrentPosition()>0){
+                    if (getIsPlaying()){
+                        musicService.pauseMusic()
+                    }
+                    //之前没有播放
+                    else{
+                        musicService.pauseToStart()
+                    }
+                }
+                //之前没有过播放
+                else{
+
                 }
             }
-            else->{}
+            R.id.bottom_song_image,R.id.bottom_song_name->{
+                val intent=Intent(view,SongUiActivity::class.java)
+                intent.putExtra("songs",ServiceSongList(listSong))
+                view.loopToSongUi(intent)
+            }
         }
     }
 }

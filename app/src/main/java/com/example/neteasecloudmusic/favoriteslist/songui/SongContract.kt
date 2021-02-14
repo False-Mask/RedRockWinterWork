@@ -13,12 +13,9 @@ interface SongContract {
         fun iconChangeToPlay()
         fun iconChangeToPause()
         fun sendToast(songUrl: String)
-        fun setCurrentTextProgressTo(current: Int)
         //改变进度条
-        fun setSeekBarMaxProgress(duration: Int)
-        fun setCurrentSeekBarProgressTo(current: Int)
         fun setBufferedBarPercent(percent: Int)
-        fun onMusicCompletion()
+        fun back()
     }
     interface SongIPresenter{
         fun pauseOrPlay(

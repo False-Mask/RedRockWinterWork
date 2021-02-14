@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -12,14 +13,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.songs.SongRvAdapter
-import com.example.neteasecloudmusic.mytools.musicservice.IServiceBindView
-import com.example.neteasecloudmusic.mytools.musicservice.MyMusicService
-import com.example.neteasecloudmusic.mytools.musicservice.setViewStatus
+import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import kotlinx.android.synthetic.main.activity_favorites.*
 
 class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
-,IServiceBindView,View.OnClickListener{
+,IServiceBindView{
     var presenter=FavoritesPresenter(this)
 
     var playListId:String=""
@@ -46,11 +45,11 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         //判断是否是使用本地存储
         useLocalCathe= intent.extras?.getBoolean("useLocalCathe")!!
         //初始化视图
-        initView(position)
+        initView(intent,position)
     }
 
     //初始化view视图
-    private fun initView(position: Int?) {
+    private fun initView(intent: Intent,position: Int?) {
         //设置recyclerview的基本属性
         val songRvAdapter=SongRvAdapter()
         //设置一下属性
@@ -69,11 +68,14 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         if (useLocalCathe){
             presenter.getSongs(position,songRvAdapter)
         }else{
-            presenter.getPlayList(playListId,songRvAdapter)
+            presenter.getPlayList(playListId,songRvAdapter,intent)
         }
         //设置recyclerview字item点击监听 presenter实现
         songRvAdapter.setOnItemClickListener(presenter)
+        //底部视图的点击监听
         bottom_pause_or_play.setOnClickListener(presenter)
+        bottom_song_name.setOnClickListener(presenter)
+        bottom_song_image.setOnClickListener(presenter)
     }
     //进度条开启
     override fun progressBarOn() {
@@ -89,19 +91,27 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         textView?.setTextColor(resources.getColor(color))
     }
 
+    override fun loopToSongUi(intent: Intent) {
+        startActivity(intent)
+    }
+
     //当view刚刚开启 绑定一下service
     override fun onStart() {
         super.onStart()
-        setViewStatus(true)
+        addView(this)
         val intent=Intent(this,MyMusicService::class.java)
+        Log.e(TAG, "开始连接" )
         bindService(intent,connection,Context.BIND_AUTO_CREATE)
     }
 
     //视图不可见接触绑定 同时其他的view绑定了当前的service
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
+        presenter.musicService.reMoveView()
+        Log.e(TAG, "开始断开连接" )
         unbindService(connection)
-        setViewStatus(false)
+        //setViewStatus(false)
+        reMoveView(this)
     }
 
 
@@ -111,13 +121,14 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     override fun setBufferedProgress(percent: Int) {}
 
     override fun serviceRefresh(songName: String, singer: String, imageUrl: String, duration: Int, currentTime: Int, songId: String) {
-        if (presenter.musicService.getIsPlaying()){
-            bottom_pause_or_play.setImageResource(R.drawable.play)
-        }else{
-            bottom_pause_or_play.setImageResource(R.drawable.pause)
-        }
-        bottom_song_name.text=songName
-        Glide.with(this).load(imageUrl).into(bottom_song_image)
+        MyToast().sendToast(this,singer+"FavoritesActivity",Toast.LENGTH_SHORT)
+            if (getIsPlaying()){
+                bottom_pause_or_play.setImageResource(R.drawable.play)
+            }else{
+                bottom_pause_or_play.setImageResource(R.drawable.pause)
+            }
+            bottom_song_name.text=songName
+            Glide.with(this).load(imageUrl).into(bottom_song_image)
     }
 
     override fun sendToast(s: String) {
@@ -125,10 +136,4 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     }
 
     override fun iconChangeToPause(){}
-    override fun onClick(v: View?) {
-        when(v?.id){
-
-        }
-    }
-
 }
