@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +37,10 @@ class MultiRvAdapter(var list: MutableList<ViewData>) : RecyclerView.Adapter<Hol
                     ViewHolderFactory.TITLE_VIEW->{
                         6
                     }
-                    ViewHolderFactory.MUSIC_FAVORITES->{
+                    ViewHolderFactory.MUSIC_FAVORITES_BIG->{
+                        6
+                    }
+                    ViewHolderFactory.MUSIC_FAVORITES_SMALL->{
                         2
                     }
                     else -> { 0 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NeteaseCloudMusic</string>
+    <string name="app_name">网抑云</string>
     <string name="default_name">无名</string>
     <string name="default_focus_count">关注   0</string>
     <string name="default_fan_count">粉丝   0</string>
@@ -53,4 +53,5 @@
     <string name="back_content_description">返回</string>
     <string name="default_bottom_text_value" >音乐~</string>
     <string name="default_description">暂无相关描述</string>
+    <string name="defaul_recommond_song">推荐歌曲</string>
 </resources>

@@ -21,6 +21,7 @@ import com.example.neteasecloudmusic.mytools.net.netJob
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.first_fragment_layout.*
 import kotlinx.android.synthetic.main.rv_song_first.*
 import kotlinx.android.synthetic.main.second_fragment_layout.*
 import kotlinx.android.synthetic.main.activity_main.user_text as user_text1

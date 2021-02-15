@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp
 
+import android.icu.text.CaseMap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,6 +17,9 @@ import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewData
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner.BannerData
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner.VpAdapter
+import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.music.MusicDataBig
+import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.music.MusicDataSmall
+import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.title.TitleData
 import com.example.neteasecloudmusic.mytools.net.netThread
 import kotlinx.android.synthetic.main.banner_view_ff.*
 import kotlinx.android.synthetic.main.first_fragment_layout.*
@@ -39,28 +43,41 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
         return view
     }
 
+
+    var multiRvAdapter:MultiRvAdapter?=null
+    val bannerData=BannerData()
+
+    val titleData=TitleData("标题栏")
+
+    val musicDataSmall1=MusicDataSmall("1",R.drawable.icon_1)
+    val musicDataSmall2=MusicDataSmall("2",R.drawable.icon_2)
+    val musicDataSmall3=MusicDataSmall("3",R.drawable.icon_3)
+
+    val musicDataBig1=MusicDataBig("1",R.drawable.icon_4)
+    val musicDataBig2=MusicDataBig("2",R.drawable.icon_5)
+
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         //设置adapter
         //val vpView: View =layoutInflater.inflate(R.layout.pager_item, null, false)
         //vpAdapter= VpAdapter(mutableListOf(vpView, vpView, vpView))
         //my_banner.adapter=vpAdapter
-        var multiRvAdapter:MultiRvAdapter
-        val bannerData=BannerData()
-        var layoutManager=GridLayoutManager(context,6)
+        val layoutManager=GridLayoutManager(context,6)
         //发送获取其他的数据
         netThread.launch (IO){
             bannerData.netList=presenter.getBanner()
 
             //初始化multiRvAdapter
-            multiRvAdapter=MultiRvAdapter(mutableListOf(bannerData))
-            multiRvAdapter.setGridSpan(layoutManager)
+            multiRvAdapter=MultiRvAdapter(mutableListOf(bannerData,titleData,musicDataSmall1
+            ,musicDataSmall2,musicDataSmall3,musicDataBig1,musicDataBig2))
+            multiRvAdapter?.setGridSpan(layoutManager)
             withContext(Main){
                 //设置adapter
                 recycler_view_ff.adapter=multiRvAdapter
                 recycler_view_ff.layoutManager=layoutManager
                 //数据的改变
-                multiRvAdapter.notifyDataSetChanged()
+                multiRvAdapter?.notifyDataSetChanged()
             }
         }
     }
@@ -69,7 +86,6 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
         super.onHiddenChanged(hidden)
         if (!hidden){
             //当FirstFragment浮现的时候
-
         }
     }
 }

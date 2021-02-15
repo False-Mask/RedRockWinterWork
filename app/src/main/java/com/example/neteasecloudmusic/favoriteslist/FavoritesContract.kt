@@ -15,6 +15,7 @@ interface FavoritesContract {
 
     interface  FavoritesIModel{
         fun getSongs(favoriteId: String):String
+        fun getTheSecondUrl(string: String):String
 
     }
     interface FavoritesIPresenter {

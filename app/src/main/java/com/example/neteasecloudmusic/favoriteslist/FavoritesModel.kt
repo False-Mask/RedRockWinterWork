@@ -7,6 +7,10 @@ class FavoritesModel :FavoritesContract.FavoritesIModel{
         return "$baseUrl/playlist/detail?id=$favoriteId"
     }
 
+    override fun getTheSecondUrl(string: String): String {
+        return "$baseUrl/song/detail?ids=$string"
+    }
+
     //歌单的详细信息 歌曲的地址 歌手的背景啥的
     data class PlayListDetails(
         var code: Int = 0,

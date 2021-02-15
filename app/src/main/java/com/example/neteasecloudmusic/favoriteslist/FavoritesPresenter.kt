@@ -25,6 +25,7 @@ import com.example.neteasecloudmusic.mytools.sharedpreferences.put
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -43,6 +44,8 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
     var model = FavoritesModel()
     var listSong: MutableList<ServiceSong> = mutableListOf()
     lateinit var musicService: MyMusicService
+
+    var extraSongs:ExtraSongs= ExtraSongs()
 
     override fun getSongs(position: Int?, songRvAdapter: SongRvAdapter) {
             //通知view打开progressbar
@@ -89,14 +92,14 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                     if (!mainActivitySp.getBoolean("is_song_data_exists", false)) {
                         //下载歌曲文件的缓存
                         downLoadSongsCathe(url, songRvAdapter, position)
-                        withContext(Dispatchers.Main) {
+                        withContext(Main) {
                             view.progressBarOff()
                         }
                     } else {
                         try {
                             songRvAdapter.setLocalList(mSongList)
                             //关闭progressbar
-                            withContext(Dispatchers.Main) {
+                            withContext(Main) {
                                 songRvAdapter.notifyDataSetChanged()
                                 view.progressBarOff()
                             }
@@ -110,7 +113,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
 
         }
 
-        //直接获取
+        //直接获取歌曲
         override fun getPlayList(playListId: String, songRvAdapter: SongRvAdapter, intent: Intent) {
             view.progressBarOn()
             val avatarUrl=intent.extras?.getString("avatarUrl")
@@ -120,63 +123,148 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
             val coverImgUrl=intent.extras?.getString("coverImgUrl")
             songRvAdapter.addTitleData(SongTitle(avatarUrl,nickname,name,description,coverImgUrl))
             netThread.launch(IO) {
-                //网络请求
-                val url = model.getSongs(playListId)
-                try {
-                    //解析获取的网络数据
-                    val respondBody = sendGetRequest(url)
-                    playListDetailsResult = Gson().fromJson(respondBody, FavoritesModel.PlayListDetails::class.java)
-                } catch (e: Exception) {
-                    Log.e(TAG, "getSongs:  Gson解析或者网络请求失败", e)
-                }
 
-                val songsData = playListDetailsResult.playlist.tracks
-                val mSongList = mutableListOf<ServiceSong>()
-
-                //开始解析数据
-                for (i in songsData) {
-                    //由于是下载歌曲可能存在歌曲数量比较多可能会出故障 try catch掉免得影响后续操作
-                    try {
-                        var artist: String
-                        //图片地址
-                        val image: String = i.al.picUrl
-                        //歌曲id
-                        val songId: String = i.id.toString()
-                        //歌曲名称
-                        val songName: String = i.name
-                        //获取歌曲对应的歌手列表
-                        val artistsData = i.ar
-                        //解析歌曲的内容
-                        val z = StringBuilder()
-                        for (x in artistsData.indices) {
-                            z.append(artistsData[x].name)
-                            if (x != artistsData.size - 1) {
-                                z.append('/')
-                            }
-                        }
-                        //后面是专辑的名称 - 是分隔符号
-                        //i.al.name是专辑名称
-                        z.append('-').append(i.al.name)
-                        artist = z.toString()
-                        //更新一下数据
-                        listSong.add(ServiceSong(artist, image, songName, songId))
-                        mSongList.add(ServiceSong(artist, image, songName, songId))
-                        //切个Main线程更新recyclerview视图
-                        withContext(Dispatchers.Main) {
-                            songRvAdapter.setNetList(mSongList)
-                            //歌单列表刷新
-                            songRvAdapter.notifyDataSetChanged()
-                            view.progressBarOff()
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "歌曲列表网络解析故障", e)
-                    }
-                }
+                sendTheFirst(playListId,songRvAdapter)
 
             }
         }
 
-        //下载song的缓存文件
+    //发送第一个网络请求
+    private suspend fun sendTheFirst(playListId: String, songRvAdapter: SongRvAdapter) {
+        //网络请求
+        val url = model.getSongs(playListId)
+        try {
+            //解析获取的网络数据
+            val respondBody = sendGetRequest(url)
+            playListDetailsResult = Gson().fromJson(respondBody, FavoritesModel.PlayListDetails::class.java)
+        } catch (e: Exception) {
+            Log.e(TAG, "getSongs:  Gson解析或者网络请求失败", e)
+        }
+
+        val songsData = playListDetailsResult.playlist.tracks
+        val mSongList = mutableListOf<ServiceSong>()
+
+        //判断是否完整
+        val getSongCount= playListDetailsResult.playlist.tracks.size
+        val tracksId= playListDetailsResult.playlist.trackIds
+        val totalSongCount=playListDetailsResult.playlist.trackCount
+
+
+        //判断是否需要半路开溜
+        if (totalSongCount==0){
+            withContext(Main){
+                view.progressBarOff()
+            }
+            return
+        }
+
+        //循环解析数据
+        //开始解析数据
+        for (i in songsData) {
+            //由于是下载歌曲可能存在歌曲数量比较多可能会出故障 try catch掉免得影响后续操作
+            try {
+                var artist: String
+                //图片地址
+                val image: String = i.al.picUrl
+                //歌曲id
+                val songId: String = i.id.toString()
+                //歌曲名称
+                val songName: String = i.name
+                //获取歌曲对应的歌手列表
+                val artistsData = i.ar
+                //解析歌曲的内容
+                val z = StringBuilder()
+                for (x in artistsData.indices) {
+                    z.append(artistsData[x].name)
+                    if (x != artistsData.size - 1) {
+                        z.append("/")
+                    }
+                }
+                //后面是专辑的名称 - 是分隔符号
+                //i.al.name是专辑名称
+                z.append("-${i.al.name}")
+                artist = z.toString()
+                //更新一下数据
+                listSong.add(ServiceSong(artist, image, songName, songId))
+                mSongList.add(ServiceSong(artist, image, songName, songId))
+
+                //切个Main线程更新recyclerview视图
+                    withContext(Main) {
+                    songRvAdapter.setNetList(mSongList)
+                    //歌单列表刷新
+                    songRvAdapter.notifyDataSetChanged()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "歌曲列表网络解析故障", e)
+            }
+        }
+        if (getSongCount<totalSongCount){
+            sendTheSecond(getSongCount,totalSongCount,tracksId,mSongList,songRvAdapter)
+        }
+
+        withContext(Main){
+            view.progressBarOff()
+        }
+
+    }
+
+    private suspend fun sendTheSecond(songCount: Int, totalSongCount: Int, tracksId: List<FavoritesModel.TrackId>, mSongList: MutableList<ServiceSong>, songRvAdapter: SongRvAdapter) {
+        //先通过append将所有的trackid拼接起来
+        val stringBuilder=StringBuilder()
+        for (x in tracksId){
+            if (x.id!= null){
+                stringBuilder.append("${x.id},")
+            }
+        }
+        val string=stringBuilder.substring(0,stringBuilder.length-1)
+        Log.e(TAG, "sendTheSecond: $string")
+        //获取发送的地址
+        val url=model.getTheSecondUrl(string)
+        //开始发送
+        val respondBody=sendGetRequest(url)
+        extraSongs=Gson().fromJson(respondBody,ExtraSongs::class.java)
+        for (x in songCount until extraSongs.songs.size){
+
+            var i = extraSongs.songs[x]
+            try {
+                var artist: String
+                //图片地址
+                val image: String = i.al.picUrl
+                //歌曲id
+                val songId: String = i.id.toString()
+                //歌曲名称
+                val songName: String = i.name
+                //获取歌曲对应的歌手列表
+                val artistsData = i.ar
+                //解析歌曲的内容
+                val z = StringBuilder()
+                for (x in artistsData.indices) {
+                    z.append(artistsData[x].name)
+                    if (x != artistsData.size - 1) {
+                        z.append("/")
+                    }
+                }
+                //后面是专辑的名称 - 是分隔符号
+                //i.al.name是专辑名称
+                z.append("-${i.al.name}")
+                artist = z.toString()
+                //更新一下数据
+                listSong.add(ServiceSong(artist, image, songName, songId))
+                mSongList.add(ServiceSong(artist, image, songName, songId))
+
+                //切个Main线程更新recyclerview视图
+                withContext(Main) {
+                    songRvAdapter.setNetList(mSongList)
+                    //歌单列表刷新
+                    songRvAdapter.notifyDataSetChanged()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "歌曲列表网络解析故障", e)
+            }
+        }
+    }
+
+    //下载song的缓存文件
         private suspend fun downLoadSongsCathe(url: String, songRvAdapter: SongRvAdapter, position: Int) {
             //初始化一下布局
             //网络请求
@@ -206,12 +294,12 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                     for (x in artistsData.indices) {
                         z.append(artistsData[x].name)
                         if (x != artistsData.size - 1) {
-                            z.append('/')
+                            z.append("/")
                         }
                     }
                     //后面是专辑的名称 - 是分隔符号
                     //i.al.name是专辑名称
-                    z.append('-').append(i.al.name)
+                    z.append("-${i.al.name}")
                     artist = z.toString()
                     //获取时间戳
                     val currentTime = System.currentTimeMillis()
@@ -222,7 +310,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                     //更新一下数据
                     mSongList.add(Song(artist, image, songName, songId))
                     //切个Main线程更新recyclerview视图
-                    withContext(Dispatchers.Main) {
+                    withContext(Main) {
                         songRvAdapter.setLocalList(mSongList)
                         //歌单列表刷新
                         songRvAdapter.notifyDataSetChanged()
