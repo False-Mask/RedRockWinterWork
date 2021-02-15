@@ -1,17 +1,22 @@
-package com.example.neteasecloudmusic.firstpagefragmentmvp
+package com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner
 
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewData
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewHolderFactory
-import com.example.neteasecloudmusic.mainactivitymvp.baseUrl
 import java.io.File
 import java.io.Serializable
 
-class FragmentModel:FirstFragmentContract.FirstFragmentIModel {
-    var banners=Banners()
-    override fun getBannerUrl(): String {
-        return "$baseUrl/banner?type=1"
-    }
-
+data class BannerData(
+        //存放url的地址
+        var netList: MutableList<NetBannerData> = mutableListOf(),
+        //存放本地image的地址
+        var localList: MutableList<LocalBannerData> = mutableListOf(),
+        //Banner的数据类
+        var banners: Banners =Banners()
+):ViewData{
+        //返回
+        override fun getType(): Int {
+            return ViewHolderFactory.BANNER_VIEW
+        }
 }
 
 //Banner数据类
@@ -54,3 +59,23 @@ data class Banner(
         var url: String? = "",
         var video: Any? = Any()
 )
+
+//本地下载数据
+data class LocalBannerData(
+        var pic: File?=null,
+        var url:String="NULL"
+): Serializable {
+    companion object {
+        const val serialVersionUID=123456L
+    }
+}
+
+//网络数据
+data class NetBannerData(
+        var imageUrl:String="",
+        var webUrl:String=""
+): Serializable {
+    companion object {
+        const val serialVersionUID=123457L
+    }
+}

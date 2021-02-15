@@ -10,11 +10,4 @@
         android:layout_width="match_parent"
         android:layout_height="170dp"
         />
-    <LinearLayout
-        android:id="@+id/point_list"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_alignBottom="@id/banner_image">
-    </LinearLayout>
 </RelativeLayout>

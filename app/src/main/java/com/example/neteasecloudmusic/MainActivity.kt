@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
                 hideAll(transaction)
                 transaction.show(firstFragment)
                 //这里也得初始化视图
-                firstFragment.initView()
+               // firstFragment.initView()
             }
         }
         //提交
@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     override fun onAvailable() {
         //下载了歌单的封面和rv的更新 自动登陆
         presenter.loginAuto()
-        presenter.getBanner()
+        //presenter.getBanner()
     }
     //无网络发一个Toast(暂时还不知道干什么)
     override fun onUnavailable() {

@@ -7,7 +7,7 @@ interface MainActivityContract {
     interface MainActivityIModel{
         fun  getLoginUrl(): String
         fun playList(): String
-        fun getBanner(): String
+        //fun getBanner(): String
     }
     interface MainActivityIView{
         fun initFragment()
@@ -15,7 +15,7 @@ interface MainActivityContract {
     }
     interface MainActivityPresenter{
         fun loginAuto()
-        fun getBanner()
+        //fun getBanner()
         fun onUnavailable()
     }
 }

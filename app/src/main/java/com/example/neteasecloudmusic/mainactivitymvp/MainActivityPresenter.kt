@@ -11,7 +11,7 @@ import android.widget.Toast
 import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.MyApplication
 import com.example.neteasecloudmusic.R
-import com.example.neteasecloudmusic.favoriteslist.songs.songList
+import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner.LocalBannerData
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.ByPhoneModel
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.loginResult
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
@@ -21,19 +21,17 @@ import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
 import com.example.neteasecloudmusic.mytools.musicservice.IServiceBindPresenter
 import com.example.neteasecloudmusic.mytools.musicservice.MyMusicService
 import com.example.neteasecloudmusic.mytools.musicservice.getIsPlaying
-import com.example.neteasecloudmusic.mytools.musicservice.getMySongId
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
 import com.example.neteasecloudmusic.mytools.toast.MyToast
-import com.example.neteasecloudmusic.myview.BannerData
 import com.example.neteasecloudmusic.recyclerview.favorites.Favorites
 import com.example.neteasecloudmusic.recyclerview.favorites.list
 import com.example.neteasecloudmusic.userfragmentmvp.rvAdapter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
 import java.io.File
 
 //存放一些配置信息
@@ -85,7 +83,7 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
             //先切线程到Main 因为 netWork的线程其实在分支线程 不能进行ui更新
             netThread.launch(Dispatchers.Main) {
                 //切到main 因为还得发送3条网络请求
-                withContext(Dispatchers.IO) {
+                withContext(IO) {
                     //io 登陆
                     try {
                         val resultBody = sendGetRequest(model.getLoginUrl())
@@ -169,39 +167,6 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
         }
 
     }
-
-    //获取banner的视图
-    override fun getBanner() {
-        val url=model.getBanner()
-        netThread.launch (Dispatchers.IO){
-            //发送获取banner图片的url
-            try {
-                val resultBody=sendGetRequest(url)
-                bannerResult=Gson().fromJson(resultBody,MainActivityModel.Banners::class.java)
-                val count=bannerResult.banners.size
-                //每一个banner有一个图片和点击跳转的url
-                val bannerList= mutableListOf<BannerData>()
-                //下载图片
-                for (i in 0 until count){
-                    downLoadImage("banner$i", bannerResult.banners[i].pic)
-                    bannerList.add(BannerData(File("$imagePath/banner$i.jpg") ,bannerResult.banners[i].url?:"NULL"))
-                }
-                //下载banner对象方便下次登陆时候的寻找
-                downLoadObjectFile(BannerDataObjectName,bannerList)
-                //下载完成
-                mainActivitySp.put {
-                    putBoolean("is_banner_cathe",true)
-                }
-            }catch (e:java.lang.Exception){
-                e.printStackTrace()
-            }
-            //切换Main线程更新Ui
-            withContext(Dispatchers.Main){
-                MainActivity.firstFragment.initView()
-            }
-        }
-    }
-
     override fun onUnavailable() {
 
     }

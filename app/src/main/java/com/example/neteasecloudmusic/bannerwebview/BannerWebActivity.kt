@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import com.example.neteasecloudmusic.R
-import com.example.neteasecloudmusic.myview.BannerData
 import kotlinx.android.synthetic.main.activity_banner_web.*
 
 class BannerWebActivity : AppCompatActivity() {
@@ -14,7 +13,7 @@ class BannerWebActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_banner_web)
         //获取url
-        var bannerData=intent.extras?.get("bannerData") as BannerData
+        //val bannerData=intent.extras?.get("bannerData") as BannerData
         my_banner_web_view.settings.apply {
             //支持javascript
             javaScriptEnabled=true
@@ -24,6 +23,6 @@ class BannerWebActivity : AppCompatActivity() {
             loadWithOverviewMode=true
         }
         my_banner_web_view.webViewClient= WebViewClient()
-        my_banner_web_view.loadUrl(bannerData.url)
+        //my_banner_web_view.loadUrl(bannerData.url)
     }
 }
