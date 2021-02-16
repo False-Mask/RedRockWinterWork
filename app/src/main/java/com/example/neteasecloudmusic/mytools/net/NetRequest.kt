@@ -68,7 +68,7 @@ private object NetRequest {
     fun innerSendPostRequest(url: String, tail: String, back: Back) {
 
         //获取HttpURLConnection
-        var httpURLConnection: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
+        val httpURLConnection: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
 
         //配置连接属性
         httpURLConnection.apply {
@@ -81,10 +81,10 @@ private object NetRequest {
         }
 
         //获取output流
-        var outputStream = httpURLConnection.outputStream
+        val outputStream = httpURLConnection.outputStream
 
         //包装成buffer流
-        var writer = BufferedWriter(OutputStreamWriter(outputStream))
+        val writer = BufferedWriter(OutputStreamWriter(outputStream))
         //写入后部分的参数
         writer.write(tail)
         //刷新
@@ -102,7 +102,7 @@ private object NetRequest {
      * back -> 回调接口
      */
     private fun getResult(connection: HttpURLConnection, back: Back) {
-        var stringBuilder = StringBuilder()
+        val stringBuilder = StringBuilder()
         if (connection.responseCode == HttpURLConnection.HTTP_OK) {
             //代表连接成功
 
@@ -122,7 +122,7 @@ private object NetRequest {
             var mye: Exception = Exception()
             //
             try {
-                var x = connection.responseMessage
+                val x = connection.responseMessage
                 Log.d(TAG, ":responseMessage  $x")
                 var y = connection.errorStream
             } catch (e: Exception) {
@@ -139,7 +139,7 @@ private object NetRequest {
      */
 
     fun innerSendGetRequest(url: String, back: Back) {
-        var connection = URL(url).openConnection() as HttpURLConnection
+        val connection = URL(url).openConnection() as HttpURLConnection
         //配置连接
         try {
             connection.apply {

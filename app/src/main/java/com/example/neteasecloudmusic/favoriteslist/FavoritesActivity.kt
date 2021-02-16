@@ -40,6 +40,15 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         //初始化
         //发送网络请求啥的啊(获取点击的position)
         val position=intent.extras?.getInt("position")
+
+//
+//        val isSendUserId=intent.extras?.getBoolean("is_send_user_id")?:false
+//
+//
+//        //如果需要发送userId获取歌单的id
+//        if (isSendUserId){
+//
+//        }
         //获取所点击的歌单的id
         playListId= intent.extras?.getString("playListId").toString()
         //判断是否是使用本地存储

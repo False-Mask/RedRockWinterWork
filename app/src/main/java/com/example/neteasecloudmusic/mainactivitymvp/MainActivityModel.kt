@@ -24,9 +24,9 @@ class MainActivityModel : MainActivityContract.MainActivityIModel{
 
         var phoneNumber:String?=null
         var password:String?=null
-        var isLogin=sp.getBoolean("is_login",false)
+        val isLogin=sp.getBoolean("is_login",false)
         if (isLogin){
-            var mData= readObjectFile(MyLoginCatheObjectFileName) as LoginCathe
+            val mData= readObjectFile(MyLoginCatheObjectFileName) as LoginCathe
             phoneNumber=mData.phoneNumber
             password=mData.password
         }

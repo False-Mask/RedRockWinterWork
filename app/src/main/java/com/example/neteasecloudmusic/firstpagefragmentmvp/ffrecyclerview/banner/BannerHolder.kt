@@ -4,7 +4,6 @@ import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
@@ -12,20 +11,10 @@ import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.context
-import com.example.neteasecloudmusic.firstpagefragmentmvp.bannerThread
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.Holder
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewData
-import com.example.neteasecloudmusic.mytools.changeDipIntoFloat
-import com.example.neteasecloudmusic.mytools.filedownload.imagePath
-import com.example.neteasecloudmusic.mytools.filedownload.mContext
-import com.example.neteasecloudmusic.userfragmentmvp.rvAdapter
 import kotlinx.android.synthetic.main.banner_view_ff.view.*
 import kotlinx.android.synthetic.main.pager_item.view.*
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class BannerHolder(itemView: View) : Holder(itemView), ViewPager.OnPageChangeListener {
     //Banner内部含有 viewPager和一个LinearLayout显示正在Banner的进度
@@ -38,7 +27,6 @@ class BannerHolder(itemView: View) : Holder(itemView), ViewPager.OnPageChangeLis
         viewPager=itemView.my_banner
         pointGroup=itemView.point_view
     }
-
 
     var imageList= mutableListOf<ImageView>()
 
@@ -54,6 +42,7 @@ class BannerHolder(itemView: View) : Holder(itemView), ViewPager.OnPageChangeLis
         viewPager?.adapter=vPAdapter
         vPAdapter.notifyDataSetChanged()
 
+        //设置pager的改变监听
         viewPager?.setOnPageChangeListener(this)
         //image的list
         for (i in 0 until  data.size){
@@ -63,28 +52,12 @@ class BannerHolder(itemView: View) : Holder(itemView), ViewPager.OnPageChangeLis
             vPAdapter.setPagerList(pagerView)
             //提示vPAdapter改变布局
             vPAdapter.notifyDataSetChanged()
-            val image=ImageView(mContext)
-            image.setImageResource(R.drawable.point_false)
-            image.layoutParams= ViewGroup.LayoutParams(changeDipIntoFloat(15f).toInt(), changeDipIntoFloat(15f).toInt())
-            pointGroup?.bringToFront()
-            pointGroup?.addView(image)
-            imageList.add(image)
+
+            BannerTools.addPoints(pointGroup,imageList,data.size)
         }
         //提示更换布局
-
-
         //自动轮播
-        bannerThread.launch(IO) {
-            var current=viewPager?.currentItem?:0
-            while (true){
-                delay(3000)
-                current = if (current==data.size-1) 0 else current+1
-                withContext(Main){
-                    viewPager?.setCurrentItem(current,true)
-                }
-                Log.e("TAG", "开始banner了$current")
-            }
-        }
+        BannerTools.bannerAutomatic(viewPager,data)
     }
 
     override fun onPageScrollStateChanged(state: Int) {

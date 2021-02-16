@@ -29,9 +29,11 @@ import com.example.neteasecloudmusic.recyclerview.favorites.Favorites
 import com.example.neteasecloudmusic.recyclerview.favorites.list
 import com.example.neteasecloudmusic.userfragmentmvp.rvAdapter
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import java.io.File
 
 //存放一些配置信息
@@ -75,13 +77,13 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
 
 
 
-
+    var loginJob:Job?=null
     //下载了歌单的封面和rv的更新 自动登陆
     override fun loginAuto() {
         //如果之前有过登陆
         if (sp.getBoolean("is_login",false)){
             //先切线程到Main 因为 netWork的线程其实在分支线程 不能进行ui更新
-            netThread.launch(Dispatchers.Main) {
+           loginJob = netThread.launch(Main) {
                 //切到main 因为还得发送3条网络请求
                 withContext(IO) {
                     //io 登陆
@@ -94,6 +96,9 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
                     try {
                         val resultBody =  sendGetRequest(model.playList())
                         playListResult = Gson().fromJson<MainActivityModel.PlayListResult>(resultBody, object : TypeToken<MainActivityModel.PlayListResult>() {}.type)
+
+
+
                         Log.e(TAG, "loginAuto: ")
                     } catch (e: Exception) { }
 

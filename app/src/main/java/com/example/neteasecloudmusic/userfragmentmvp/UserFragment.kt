@@ -35,7 +35,7 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView 
     //sp数据库的名称
     var TAG="UserFragment"
     companion object{
-        val USER_BASIC_SP_NAME="user_basic_data"
+        const val USER_BASIC_SP_NAME="user_basic_data"
     }
 
     //view被刚刚创建的时候

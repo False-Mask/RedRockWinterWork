@@ -116,16 +116,15 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
         //直接获取歌曲
         override fun getPlayList(playListId: String, songRvAdapter: SongRvAdapter, intent: Intent) {
             view.progressBarOn()
-            val avatarUrl=intent.extras?.getString("avatarUrl")
-            val nickname=intent.extras?.getString("nickname")
-            val name=intent.extras?.getString("name")
-            val description=intent.extras?.getString("description")
-            val coverImgUrl=intent.extras?.getString("coverImgUrl")
-            songRvAdapter.addTitleData(SongTitle(avatarUrl,nickname,name,description,coverImgUrl))
+//            val avatarUrl=intent.extras?.getString("avatarUrl")
+//            val nickname=intent.extras?.getString("nickname")
+//            val name=intent.extras?.getString("name")
+//            val description=intent.extras?.getString("description")
+//            val coverImgUrl=intent.extras?.getString("coverImgUrl")
+//            songRvAdapter.addTitleData(SongTitle(avatarUrl,nickname,name,description,coverImgUrl))
+
             netThread.launch(IO) {
-
                 sendTheFirst(playListId,songRvAdapter)
-
             }
         }
 
@@ -144,6 +143,15 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
         val songsData = playListDetailsResult.playlist.tracks
         val mSongList = mutableListOf<ServiceSong>()
 
+        val nickname= playListDetailsResult.playlist.creator.nickname
+        val avatarUrl= playListDetailsResult.playlist.creator.avatarUrl
+        val name= playListDetailsResult.playlist.name
+        val description= playListDetailsResult.playlist.description
+        val coverImgUrl= playListDetailsResult.playlist.coverImgUrl
+        songRvAdapter.addTitleData(SongTitle(avatarUrl,nickname,name,description,coverImgUrl))
+        withContext(Main){
+            songRvAdapter.notifyDataSetChanged()
+        }
         //判断是否完整
         val getSongCount= playListDetailsResult.playlist.tracks.size
         val tracksId= playListDetailsResult.playlist.trackIds
@@ -225,7 +233,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
         extraSongs=Gson().fromJson(respondBody,ExtraSongs::class.java)
         for (x in songCount until extraSongs.songs.size){
 
-            var i = extraSongs.songs[x]
+            val i = extraSongs.songs[x]
             try {
                 var artist: String
                 //图片地址
@@ -404,7 +412,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
         //添加到视图里面
         //musicService.addBindView(view)
 
-        Log.d(TAG, "onServiceConnected: " + musicService)
+        Log.d(TAG, "onServiceConnected: $musicService")
     }
 
     override fun onMusicCompletion() {

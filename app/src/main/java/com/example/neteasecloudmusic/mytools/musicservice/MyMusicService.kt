@@ -174,7 +174,7 @@ class MyMusicService : Service()
             serviceSongData=Gson().fromJson(resultBody, SongData::class.java)
             //表示请求成功 并且还拿到了链接
             if (serviceSongData.code==200 && serviceSongData.data[0].code!=404){
-                serviceSongData.data[0].url
+                if (serviceSongData.data[0].url!=null) serviceSongData.data[0].url else "null"
             }
             else{
                 "NULL"
@@ -273,6 +273,11 @@ class MyMusicService : Service()
                         iconChangeToPause()
                     }
                     comeAcrossError()
+                }
+                "null"-> withContext(Main){
+                    doForAll {
+                        sendToast("好像没找到资源~")
+                    }
                 }
                 // 3 成功
                 else-> {

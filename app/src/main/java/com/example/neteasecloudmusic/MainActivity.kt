@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         transaction.commit()
         //window
     }
-//跳转至 songUiActivity
+    //跳转至 songUiActivity
     override fun loopToSongUi() {
         val intent=Intent(this,SongUiActivity::class.java)
         startActivity(intent)

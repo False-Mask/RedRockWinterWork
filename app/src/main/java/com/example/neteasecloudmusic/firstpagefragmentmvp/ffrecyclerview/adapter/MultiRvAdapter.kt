@@ -38,15 +38,22 @@ class MultiRvAdapter(var list: MutableList<ViewData>) : RecyclerView.Adapter<Hol
                         6
                     }
                     ViewHolderFactory.MUSIC_FAVORITES_BIG->{
-                        6
+                        3
                     }
                     ViewHolderFactory.MUSIC_FAVORITES_SMALL->{
                         2
+                    }
+                    ViewHolderFactory.MUSIC_FAVORITES_TOP->{
+                        6
                     }
                     else -> { 0 }
                 }
             }
 
         }
+    }
+
+    fun setMultiList(list:MutableList<ViewData>){
+        this.list=list
     }
 }

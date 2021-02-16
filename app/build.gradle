@@ -57,4 +57,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
 
+    //刷新布局的依赖
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+
 }

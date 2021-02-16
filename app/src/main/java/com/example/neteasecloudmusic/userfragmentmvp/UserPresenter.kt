@@ -83,6 +83,8 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter
     //Rv被点击了
     override fun rvItemClicked(v: View, position: Int) {
         val intent=Intent(context,FavoritesActivity::class.java)
+        //这是收藏夹内的跳转
+        //由于收藏夹不知道具体用户的歌单id只能根据用户的登陆id进行处理
         var x=playListResult?.playlist?.get(position)
         x?.apply {
             intent.putExtra("position",position)
@@ -100,8 +102,10 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter
             intent.putExtra("useLocalCathe",false)
 
             intent.putExtra("coverImgUrl",coverImgUrl)
-
         }
+        //放入一个值判断是否是要先发送一个获取favorites的id
+        intent.putExtra("is_send_user_id",true)
+
         view.favoritesClicked(v,position,intent)
         MyToast().sendToast(mContext,"${position}被点击",Toast.LENGTH_SHORT)
     }

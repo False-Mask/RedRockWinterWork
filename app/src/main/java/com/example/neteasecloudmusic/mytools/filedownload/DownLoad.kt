@@ -8,10 +8,10 @@ import java.net.URL
 
 //存放图像文件
 suspend fun downLoadImage(filename:String,url:String){
-    var imageDir=File(imagePath?:"NULL")
+    val imageDir=File(imagePath?:"NULL")
     if (!imageDir.exists()) imageDir.mkdirs()
 
-    var imageFile=File("$imagePath/$filename.jpg")
+    val imageFile=File("$imagePath/$filename.jpg")
     if (!imageFile.exists()) imageFile.createNewFile()
     //从网络上copy文件
     DownLoad.copyFromNet(imageFile,url)
@@ -19,10 +19,10 @@ suspend fun downLoadImage(filename:String,url:String){
 
 //存放音频缓存文件
 suspend fun downLoadMusic(filename:String,url:String) {
-    var musicDir = File(musicPath?:"NULL")
+    val musicDir = File(musicPath?:"NULL")
     if (!musicDir.exists()) musicDir.mkdirs()
 
-    var musicFile = File("$musicPath/$filename.mp4")
+    val musicFile = File("$musicPath/$filename.mp4")
     if (!musicFile.exists()) musicFile.createNewFile()
     //copy
     DownLoad.copyFromNet(musicFile, url)
@@ -30,12 +30,12 @@ suspend fun downLoadMusic(filename:String,url:String) {
 
 //读取文件
 fun readObjectFile(name: String):Any{
-    var file=File("$filesPath/$name")
+    val file=File("$filesPath/$name")
     if (!file.exists()){
         file.createNewFile()
     }
-    var objIn=ObjectInputStream(FileInputStream(file))
-    var obj=objIn.readObject()
+    val objIn=ObjectInputStream(FileInputStream(file))
+    val obj=objIn.readObject()
 
     //关闭流
     objIn.close()
@@ -69,7 +69,7 @@ private object DownLoad{
     fun copyFromNet(imageFile: File, url: String) {
 
         //网络连接
-        var connection= URL(url).openConnection() as HttpURLConnection
+        val connection= URL(url).openConnection() as HttpURLConnection
         connection.apply {
             doInput = true
             readTimeout = 5000
@@ -77,8 +77,8 @@ private object DownLoad{
             defaultUseCaches = false
             requestMethod="GET"
         }
-        var bufferedIn=connection.inputStream.buffered()
-        var bufferedOut=FileOutputStream(imageFile).buffered()
+        val bufferedIn=connection.inputStream.buffered()
+        val bufferedOut=FileOutputStream(imageFile).buffered()
 
         bufferedOut.write(bufferedIn.readBytes())
 

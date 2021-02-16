@@ -45,7 +45,7 @@ data class Song(
     var id: Int = 0,
     var l: L = L(),
     var m: M = M(),
-    var mark: Int = 0,
+    var mark: Long = 0,
     var mst: Int = 0,
     var mv: Int = 0,
     var name: String = "",
@@ -100,19 +100,19 @@ data class H(
     var br: Int = 0,
     var fid: Int = 0,
     var size: Int = 0,
-    var vd: Int = 0
+    var vd: Double = 0.0
 )
 
 data class L(
     var br: Int = 0,
     var fid: Int = 0,
     var size: Int = 0,
-    var vd: Int = 0
+    var vd: Double = 0.0
 )
 
 data class M(
     var br: Int = 0,
     var fid: Int = 0,
     var size: Int = 0,
-    var vd: Int = 0
+    var vd: Double = 0.0
 )

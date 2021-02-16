@@ -3,9 +3,10 @@ package com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.music
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewData
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewHolderFactory
 
-data class MusicDataSmall(
+data class MusicSmallData(
         var text: String="",
-        var image:Int=0
+        var image:String="",
+        var id:String=""
 
 ):ViewData{
     override fun getType(): Int {

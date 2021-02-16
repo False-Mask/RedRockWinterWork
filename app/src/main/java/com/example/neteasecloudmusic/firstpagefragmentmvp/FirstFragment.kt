@@ -1,27 +1,21 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp
 
-import android.icu.text.CaseMap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.MultiAutoCompleteTextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.viewpager.widget.ViewPager
 import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.MultiRvAdapter
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewData
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner.BannerData
-import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner.VpAdapter
-import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.music.MusicDataBig
-import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.music.MusicDataSmall
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.title.TitleData
 import com.example.neteasecloudmusic.mytools.net.netThread
-import kotlinx.android.synthetic.main.banner_view_ff.*
+import com.example.neteasecloudmusic.mytools.toast.MyToast
 import kotlinx.android.synthetic.main.first_fragment_layout.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -31,31 +25,40 @@ import kotlinx.coroutines.withContext
 class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContract.FirstFragmentIView
 {
     var TAG="FirstFragment"
-
-    private var pointList= mutableListOf<ImageView>()
-    var presenter=FragmentPresenter(this)
-    var list= mutableListOf<View>()
-    private var vpAdapter: VpAdapter?=null
     private var mContext=mainActivity
+
+    //banner点的列表
+    //private var pointList= mutableListOf<ImageView>()
+
+    //private var vpAdapter: VpAdapter?=null
+
+    var presenter=FragmentPresenter(this)
+    //private val musicDataBig2=MusicDataBig("2",)
+    //private val musicDataBig1=MusicDataBig("1",)
+    //private val musicDataSmall3=MusicDataSmall("3",)
+    //private val musicDataSmall2=MusicDataSmall("2",)
+    //private val musicDataSmall1=MusicDataSmall("1",)
+
+
+    var multiRvAdapter:MultiRvAdapter?=null
+    private val bannerData=BannerData()
+
+    //第一个title
+    private val titleData1=TitleData("推荐歌曲")
+    var list= mutableListOf<View>()
+
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view=inflater.inflate(R.layout.first_fragment_layout,container,false)
         Log.e(TAG, "onCreateView: " )
         return view
     }
 
+    //小型的布局
 
-    var multiRvAdapter:MultiRvAdapter?=null
-    val bannerData=BannerData()
+    //稍微大一点的布局
 
-    val titleData=TitleData("标题栏")
-
-    val musicDataSmall1=MusicDataSmall("1",R.drawable.icon_1)
-    val musicDataSmall2=MusicDataSmall("2",R.drawable.icon_2)
-    val musicDataSmall3=MusicDataSmall("3",R.drawable.icon_3)
-
-    val musicDataBig1=MusicDataBig("1",R.drawable.icon_4)
-    val musicDataBig2=MusicDataBig("2",R.drawable.icon_5)
-
+    //var multiList= mutableListOf<ViewData>()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -63,23 +66,47 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
         //val vpView: View =layoutInflater.inflate(R.layout.pager_item, null, false)
         //vpAdapter= VpAdapter(mutableListOf(vpView, vpView, vpView))
         //my_banner.adapter=vpAdapter
-        val layoutManager=GridLayoutManager(context,6)
-        //发送获取其他的数据
-        netThread.launch (IO){
-            bannerData.netList=presenter.getBanner()
+        //val layoutManager=GridLayoutManager(context,6)
 
-            //初始化multiRvAdapter
-            multiRvAdapter=MultiRvAdapter(mutableListOf(bannerData,titleData,musicDataSmall1
-            ,musicDataSmall2,musicDataSmall3,musicDataBig1,musicDataBig2))
-            multiRvAdapter?.setGridSpan(layoutManager)
-            withContext(Main){
-                //设置adapter
-                recycler_view_ff.adapter=multiRvAdapter
-                recycler_view_ff.layoutManager=layoutManager
-                //数据的改变
-                multiRvAdapter?.notifyDataSetChanged()
-            }
-        }
+        presenter.initRecyclerView()
+//        //发送获取其他的数据
+//        netThread.launch (IO){
+//            bannerData.netList=presenter.getBanner()
+//            //添加banner的数据
+//            multiList.add(bannerData)
+//
+//            //初始化adapter
+//            multiRvAdapter=MultiRvAdapter(multiList)
+//            //设置布局管理器
+//            multiRvAdapter?.setGridSpan(layoutManager)
+//
+//            //设置adapter和layoutManager
+//            recycler_view_ff.adapter=multiRvAdapter
+//            recycler_view_ff.layoutManager=layoutManager
+//
+//            //添加标题
+//            multiList.add(TitleData("推荐歌曲"))
+//            multiRvAdapter?.setMultiList(multiList)
+//            multiRvAdapter?.notifyDataSetChanged()
+//
+//            //添加
+//            //设置recyclerView的list
+//
+//
+//            withContext(Main){
+//                multiRvAdapter?.notifyDataSetChanged()
+//            }
+//
+//
+//            //标题栏
+//
+//            //请求获取到推荐歌单
+//
+//        }
+
+        //刷新的实现丢给presenter干
+        swipe_layout.setOnRefreshListener (presenter)
+
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -87,5 +114,13 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
         if (!hidden){
             //当FirstFragment浮现的时候
         }
+    }
+
+    override fun sendToast(s: String) {
+        MyToast().sendToast(mContext,s,Toast.LENGTH_SHORT)
+    }
+
+    override fun setFreshOff() {
+        swipe_layout.isRefreshing=false
     }
 }
