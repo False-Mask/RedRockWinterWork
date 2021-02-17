@@ -19,6 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="n">
+        <activity android:name="com.example.neteasecloudmusic.firstpagefragmentmvp.search.SearchActivity"></activity>
         <activity android:name=".bannerwebview.BannerWebActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

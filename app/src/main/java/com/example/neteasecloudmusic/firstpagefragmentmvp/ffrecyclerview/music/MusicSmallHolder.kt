@@ -5,6 +5,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.context
 import com.example.neteasecloudmusic.favoriteslist.FavoritesActivity
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.Holder
@@ -21,7 +23,10 @@ class MusicSmallHolder(itemView: View) : Holder(itemView) {
     }
     override fun setBindView(holder: MutableList<ViewData>, position: Int) {
         val date = holder[position] as MusicSmallData
-        Glide.with(itemView).load(date.image).into(imageView!!)
+        Glide.with(itemView)
+                .load(date.image)
+                .apply(RequestOptions.bitmapTransform(RoundedCorners(20)))
+                .into(imageView!!)
         textView?.text=date.text
 
         itemView.setOnClickListener{

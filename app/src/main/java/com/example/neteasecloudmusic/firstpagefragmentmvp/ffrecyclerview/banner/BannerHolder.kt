@@ -9,6 +9,8 @@ import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.context
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.Holder
@@ -47,7 +49,8 @@ class BannerHolder(itemView: View) : Holder(itemView), ViewPager.OnPageChangeLis
         //image的list
         for (i in 0 until  data.size){
             val view=LayoutInflater.from(context).inflate(R.layout.pager_item,null,false)
-            Glide.with(view).load(data[i].imageUrl).into(view.banner_image)
+            Glide.with(view).load(data[i].imageUrl)
+                    .apply(RequestOptions.bitmapTransform(RoundedCorners(30))).into(view.banner_image)
             pagerView.add(view)
             vPAdapter.setPagerList(pagerView)
             //提示vPAdapter改变布局

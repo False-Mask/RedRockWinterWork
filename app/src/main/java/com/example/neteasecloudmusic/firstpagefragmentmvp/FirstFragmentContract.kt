@@ -7,6 +7,7 @@ interface FirstFragmentContract {
     interface FirstFragmentIView{
         fun sendToast(s: String)
         fun setFreshOff()
+        fun loopToSearchActivity()
 //        fun initView()
 //        fun changeBanner(now: Int)
     }

@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,20 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
 import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.MultiRvAdapter
-import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewData
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner.BannerData
+import com.example.neteasecloudmusic.firstpagefragmentmvp.search.SearchActivity
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.title.TitleData
-import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import kotlinx.android.synthetic.main.first_fragment_layout.*
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContract.FirstFragmentIView
 {
@@ -51,6 +46,7 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view=inflater.inflate(R.layout.first_fragment_layout,container,false)
         Log.e(TAG, "onCreateView: " )
+
         return view
     }
 
@@ -67,6 +63,8 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
         //vpAdapter= VpAdapter(mutableListOf(vpView, vpView, vpView))
         //my_banner.adapter=vpAdapter
         //val layoutManager=GridLayoutManager(context,6)
+        search_image_sa.setOnClickListener(presenter)
+        search_text.setOnClickListener(presenter)
 
         presenter.initRecyclerView()
 //        //发送获取其他的数据
@@ -122,5 +120,10 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
 
     override fun setFreshOff() {
         swipe_layout.isRefreshing=false
+    }
+
+    override fun loopToSearchActivity() {
+        val intent=Intent(mContext,SearchActivity::class.java)
+        startActivity(intent)
     }
 }

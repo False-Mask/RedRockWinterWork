@@ -8,6 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.FavoritesActivity
 import com.example.neteasecloudmusic.favoriteslist.playListDetailsResult
@@ -160,8 +163,11 @@ class SongRvAdapter : RecyclerView.Adapter<SongRvAdapter.Holder>() {
                         listener.titleClicked(view)
                     }
                     try {
-                        Glide.with(view).load(titleData?.avatarUrl).into(titleView?.song_list_head_show!!)
-                        Glide.with(view).load(titleData?.coverImgUrl).into(titleView?.favorite_image!!)
+                        //加载圆形图片
+                        Glide.with(view).load(titleData?.avatarUrl)
+                                .apply(RequestOptions.bitmapTransform(CircleCrop())).into(titleView?.song_list_head_show!!)
+
+                        Glide.with(view).load(titleData?.coverImgUrl).apply(RequestOptions.bitmapTransform(RoundedCorners(20))).into(titleView?.favorite_image!!)
                         if(titleData?.description!=""){
                             titleView!!.brief_introduction.text=titleData?.description
                         }

@@ -8,6 +8,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.mytools.changMsIntoMinutesAndSecond
 import com.example.neteasecloudmusic.mytools.musicservice.*
@@ -115,7 +117,9 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     //改变SeekBar对应的位置
     override fun serviceRefresh(songName: String, singer: String, imageurl: String, duration: Int, currentTime: Int, songId: String) {
         song_ui_seek_bar.progress=currentTime
-        Glide.with(this).load(imageurl).into(song_ui_song_image_view)
+        //加载圆形图片
+        Glide.with(this).load(imageurl)
+                .apply(RequestOptions.bitmapTransform(CircleCrop())).into(song_ui_song_image_view)
         song_ui_song_name.text=songName
         song_ui_singer_name.text=singer
         song_ui_seek_bar.max=duration

@@ -11,17 +11,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" />
 
-    <ImageView
-        android:id="@+id/favorite_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:contentDescription="@string/favorites_image"
-        android:src="@drawable/favorite_icon"
-        app:layout_constraintBottom_toTopOf="@+id/guideline6"
-        app:layout_constraintEnd_toStartOf="@+id/guideline5"
-        app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
-
     <TextView
         android:id="@+id/favorite_name"
         android:layout_width="0dp"
@@ -84,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.63" />
+        app:layout_constraintGuide_percent="0.6" />
 
     <TextView
         android:id="@+id/brief_introduction"
@@ -147,5 +136,18 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.41" />
+
+    <ImageView
+        android:id="@+id/favorite_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/favorites_image"
+        android:elevation="3dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/favorite_icon"
+        app:layout_constraintBottom_toTopOf="@+id/guideline6"
+        app:layout_constraintEnd_toStartOf="@+id/guideline5"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

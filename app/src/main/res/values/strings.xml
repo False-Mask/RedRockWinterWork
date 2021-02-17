@@ -51,7 +51,9 @@
     <string name="song_name">歌曲名称</string>
     <string name="singer_name">歌手</string>
     <string name="back_content_description">返回</string>
-    <string name="default_bottom_text_value" >音乐~</string>
+    <string name="default_bottom_text_value">音乐~</string>
     <string name="default_description">暂无相关描述</string>
     <string name="defaul_recommond_song">推荐歌曲</string>
+    <string name="default_search_bar_text">搜索</string>
+    <string name="default_text_sa_hint">搜索</string>
 </resources>

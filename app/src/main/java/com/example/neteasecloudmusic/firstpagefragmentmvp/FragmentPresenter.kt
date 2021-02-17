@@ -4,9 +4,11 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
+import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.neteasecloudmusic.MainActivity
+import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.context
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.MultiRvAdapter
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.ViewData
@@ -29,7 +31,7 @@ import kotlinx.coroutines.Dispatchers.Main
 var bannerJob= Job()
 var bannerThread= CoroutineScope(bannerJob)
 class FragmentPresenter(firstFragment: FirstFragment) :FirstFragmentContract.FirstFragmentIPresenter
-,ServiceConnection, SwipeRefreshLayout.OnRefreshListener {
+,ServiceConnection, SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
     var view=firstFragment
     var model=FragmentModel()
     var isBannering=false
@@ -334,6 +336,20 @@ class FragmentPresenter(firstFragment: FirstFragment) :FirstFragmentContract.Fir
                 }
 
                 view.setFreshOff()
+            }
+        }
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id){
+            R.id.search_image_sa->{
+                view.loopToSearchActivity()
+            }
+            R.id.search_text->{
+                view.loopToSearchActivity()
+            }
+            else->{
+
             }
         }
     }

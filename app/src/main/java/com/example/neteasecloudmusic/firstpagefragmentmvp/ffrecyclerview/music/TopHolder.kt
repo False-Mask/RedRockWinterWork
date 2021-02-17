@@ -5,6 +5,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.context
 import com.example.neteasecloudmusic.favoriteslist.FavoritesActivity
 import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter.Holder
@@ -22,7 +24,11 @@ class TopHolder(itemView: View) : Holder(itemView) {
     override fun setBindView(holder: MutableList<ViewData>, position: Int) {
         val data=holder[position] as TopData
         textView?.text=data.text
-        Glide.with(itemView).load(data.image).into(imageView!!)
+        Glide
+                .with(itemView)
+                .load(data.image)
+                .apply(RequestOptions.bitmapTransform(RoundedCorners(15)))
+                .into(imageView!!)
         itemView?.setOnClickListener {
             val intent=Intent(context,FavoritesActivity::class.java)
 

@@ -11,9 +11,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.R
-import com.example.neteasecloudmusic.favoriteslist.FavoritesActivity
 import com.example.neteasecloudmusic.loginactivity.LoginActivity
 import com.example.neteasecloudmusic.mytools.filedownload.mContext
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
@@ -99,6 +100,9 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView 
     //改变user的界面
     override fun changeUserTitle(username: String?, userIconUrl: File?) {
         user_name.text=username
-        Glide.with(MainActivity.secondFragment).load(userIconUrl).into(user_head_show_icon)
+        Glide.with(MainActivity.secondFragment)
+                .load(userIconUrl)
+                .apply(RequestOptions.bitmapTransform(CircleCrop()))
+                .into(user_head_show_icon)
     }
 }
