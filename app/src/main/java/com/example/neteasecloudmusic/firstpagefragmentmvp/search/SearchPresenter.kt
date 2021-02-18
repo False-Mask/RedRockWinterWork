@@ -2,13 +2,14 @@ package com.example.neteasecloudmusic.firstpagefragmentmvp.search
 
 import android.content.ComponentName
 import android.content.ServiceConnection
+import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
 import android.view.View
-import com.example.neteasecloudmusic.mytools.filedownload.filesPath
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendPostRequest
+import com.example.neteasecloudmusic.view.PlayPauseIcon
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -17,7 +18,7 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
-,ServiceConnection{
+,ServiceConnection, IServiceBindPresenter,PlayPauseIcon.Click {
     val model =SearchModel()
 
     val TAG="SearchPresenter"
@@ -130,6 +131,44 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
         Log.e(SearchActivity.TAG, "音乐服务器连接成功" )
         //获取音乐服务器
         musicService=(service as MyMusicService.MyBinder).getService()
+    }
+
+    override fun onMusicCompletion() {
+
+    }
+
+    override fun onMusicStart() {
+
+    }
+
+    override fun onMusicSeekComplete(mp: MediaPlayer?) {
+
+    }
+
+    override fun onStarted() {
+        view.start()
+    }
+
+    override fun onPreparing() {
+        view.loading()
+    }
+
+    override fun onPause() {
+        view.iconChangeToPause()
+    }
+
+    override fun onResume() {
+        val percent= getCurrentPosition().toFloat()/getDuration()
+        view.resume(percent)
+    }
+
+    override fun onPlayPauseViewClick(v: View) {
+        val view=v as PlayPauseIcon
+        if (view.status==PlayPauseIcon.PlayStatus.Pausing){
+            this.view.resume(getCurrentPosition().toFloat()/ getDuration())
+        }else if (view.status==PlayPauseIcon.PlayStatus.Playing){
+            this.view.iconChangeToPause()
+        }
     }
 
 }

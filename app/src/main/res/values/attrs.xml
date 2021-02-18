@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PlayPauseIcon">
+
+        <!--        加载完成或者还没加载的歌曲属性-->
+        <attr name="outer_circle_size" format="dimension"/>
+        <attr name="outer_circle_color" format="color"/>
+
+
+        <!--        加载歌曲时候的view属性-->
+        <attr name="loading_circle_size" format="dimension"/>
+        <attr name="loading_circle_color" format="color"/>
+
+        <!--        播放时候的bar的进度条view属性-->
+        <attr name="play_bar_size" format="dimension"/>
+        <attr name="play_bar_color" format="color"/>
+
+        <!--        暂停键的属性-->
+        <!--        width是暂停键的竖线的宽度-->
+        <!--        height是暂停键的高度-->
+        <attr name="pause_icon_color" format="color"/>
+
+        <!--        播放键的属性(size是播放键内等边3角的边长)-->
+        <attr name="play_icon_color" format="color"/>
+
+
+    </declare-styleable>
+</resources>

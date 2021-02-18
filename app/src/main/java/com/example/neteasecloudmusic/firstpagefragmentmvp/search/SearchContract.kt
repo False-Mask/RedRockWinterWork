@@ -8,6 +8,9 @@ interface SearchContract {
 
 
     interface SearchIView{
+        fun resume(percent: Float)
+        fun loading()
+        fun start()
 
 
     }

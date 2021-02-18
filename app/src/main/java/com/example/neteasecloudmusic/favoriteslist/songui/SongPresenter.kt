@@ -2,6 +2,7 @@ package com.example.neteasecloudmusic.favoriteslist.songui
 
 import android.content.ComponentName
 import android.content.ServiceConnection
+import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
 import android.view.View
@@ -11,6 +12,7 @@ import com.example.neteasecloudmusic.favoriteslist.songs.Song
 import com.example.neteasecloudmusic.favoriteslist.songs.Songs
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
+import com.example.neteasecloudmusic.view.PlayPauseIcon
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_song_ui.*
 import kotlinx.coroutines.*
@@ -21,7 +23,8 @@ var songThread= CoroutineScope(songJob)
 class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         ,SeekBar.OnSeekBarChangeListener
         ,ServiceConnection
-        ,View.OnClickListener{
+        ,View.OnClickListener, IServiceBindPresenter
+,PlayPauseIcon.Click{
     val TAG="SongPresenter"
     var view=activity
     var model=SongModel()
@@ -227,6 +230,42 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
 
     }
 
+    override fun onMusicStart() {
+
+    }
+
+    override fun onMusicSeekComplete(mp: MediaPlayer?) {
+
+    }
+
+    override fun onStarted() {
+        view.start()
+    }
+
+    override fun onPreparing() {
+        view.loading()
+    }
+
+    override fun onPause() {
+        view.iconChangeToPause()
+    }
+
+    override fun onResume() {
+        val percent= getCurrentPosition().toFloat()/getDuration()
+        view.resume(percent)
+    }
+
+    override fun onPlayPauseViewClick(v: View) {
+        val view=v as PlayPauseIcon
+        if (view.status== PlayPauseIcon.PlayStatus.Pausing){
+            musicService.pauseToStart()
+            this.view.resume(getCurrentPosition().toFloat()/ getDuration())
+        }else if (view.status== PlayPauseIcon.PlayStatus.Playing){
+            musicService.pauseMusic()
+            this.view.iconChangeToPause()
+        }
+    }
+
     //SeekBar的监听
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 //        view.setCurrentTextProgressTo(progress)
@@ -277,8 +316,6 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Log.e(TAG, "音乐服务连接成功" )
         musicService=(service as MyMusicService.MyBinder ).getService()
-        //设置musicService
-        musicService.addBindView(view)
     }
 
     override fun onClick(v: View?) {

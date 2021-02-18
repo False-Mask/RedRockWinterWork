@@ -34,16 +34,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/song_list_rv">
 
-        <ImageView
-            android:id="@+id/bottom_pause_or_play"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline14"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/pause" />
-
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline13"
             android:layout_width="wrap_content"
@@ -79,6 +69,16 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline14"
             app:layout_constraintStart_toStartOf="@+id/guideline13"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.example.neteasecloudmusic.view.PlayPauseIcon
+            android:id="@+id/bottom_pause_or_play"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/bottom_song_name"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

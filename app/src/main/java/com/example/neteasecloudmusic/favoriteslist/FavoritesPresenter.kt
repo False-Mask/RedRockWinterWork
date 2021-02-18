@@ -14,6 +14,7 @@ import com.example.neteasecloudmusic.favoriteslist.songs.SongTitle
 import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
 import com.example.neteasecloudmusic.mainactivitymvp.mainActivitySp
 import com.example.neteasecloudmusic.mainactivitymvp.playListResult
+import com.example.neteasecloudmusic.mytools.changeDipIntoFloat
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadObjectFile
 import com.example.neteasecloudmusic.mytools.filedownload.imagePath
@@ -22,9 +23,11 @@ import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
+import com.example.neteasecloudmusic.view.PlayPauseIcon
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -35,7 +38,8 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
 ,SongRvAdapter.OnClickListener
 ,ServiceConnection
 ,IServiceBindPresenter
-,View.OnClickListener {
+,View.OnClickListener
+,PlayPauseIcon.Click{
     val TAG = "FavoritesPresenter"
 
     //获取song的详细信息
@@ -426,6 +430,24 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
 
     }
 
+    override fun onStarted() {
+        view.start()
+    }
+
+    override fun onPreparing() {
+        view.preparing()
+    }
+
+    override fun onPause() {
+        //musicService.pauseMusic()
+        view.pause()
+    }
+
+    override fun onResume() {
+        //musicService.pauseToStart()
+        view.resume(getCurrentPosition().toFloat()/ getDuration())
+    }
+
     override fun onClick(v: View?) {
         when(v?.id){
             R.id.bottom_pause_or_play->{
@@ -449,6 +471,17 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                 intent.putExtra("songs",ServiceSongList(listSong))
                 view.loopToSongUi(intent)
             }
+        }
+    }
+
+    override fun onPlayPauseViewClick(v: View) {
+        var v2=v as PlayPauseIcon
+        if (v2.status==PlayPauseIcon.PlayStatus.Playing){
+            musicService.pauseMusic()
+            onPause()
+        }else if(v2.status==PlayPauseIcon.PlayStatus.Pausing){
+            musicService.pauseToStart()
+            onResume()
         }
     }
 }

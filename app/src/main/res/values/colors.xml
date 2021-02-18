@@ -18,4 +18,11 @@
 <!--    按下以后的显色-->
     <color name="button_color_1_true">#236fd7</color>
     <color name="button_color_2_true">#DCDCDC</color>
+
+<!--    PlayPause View的默认颜色-->
+    <color name="default_outer_circle_color">#E6E6E6</color>
+    <color name="default_loading_circle_color">#000000</color>
+    <color name="default_play_bar_color">#000000</color>
+    <color name="default_pause_icon_color">#000000</color>
+    <color name="default_play_icon_color">#000000</color>
 </resources>

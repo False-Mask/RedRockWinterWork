@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.favoriteslist
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
@@ -15,6 +16,7 @@ import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.songs.SongRvAdapter
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
+import com.example.neteasecloudmusic.view.PlayPauseIcon
 import kotlinx.android.synthetic.main.activity_favorites.*
 
 class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
@@ -26,6 +28,8 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     val TAG="FavoritesActivity"
 
     lateinit var musicService:MyMusicService
+
+    var animator:ObjectAnimator?=null
 
     //定义连接presenter实现
     private var connection = presenter as ServiceConnection
@@ -82,7 +86,7 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         //设置recyclerview字item点击监听 presenter实现
         songRvAdapter.setOnItemClickListener(presenter)
         //底部视图的点击监听
-        bottom_pause_or_play.setOnClickListener(presenter)
+        bottom_pause_or_play.addOnViewClickListener(presenter)
         bottom_song_name.setOnClickListener(presenter)
         bottom_song_image.setOnClickListener(presenter)
     }
@@ -104,10 +108,35 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         startActivity(intent)
     }
 
+    override fun resume(fl: Float) {
+        bottom_pause_or_play.status=PlayPauseIcon.PlayStatus.Playing
+        bottom_pause_or_play.progressPercent=fl
+    }
+
+    override fun pause() {
+        animator?.cancel()
+        bottom_pause_or_play.status=PlayPauseIcon.PlayStatus.Pausing
+    }
+
+    override fun preparing() {
+        bottom_pause_or_play.status=PlayPauseIcon.PlayStatus.Loading
+        animator=ObjectAnimator.ofFloat(bottom_pause_or_play,"angle",0f,360f)
+        animator?.apply {
+            duration=1000
+            repeatCount=-1
+            start()
+        }
+    }
+
+    override fun start() {
+        bottom_pause_or_play.status=PlayPauseIcon.PlayStatus.Playing
+    }
+
     //当view刚刚开启 绑定一下service
     override fun onStart() {
         super.onStart()
         addView(this)
+        addPresenter(presenter)
         val intent=Intent(this,MyMusicService::class.java)
         Log.e(TAG, "开始连接" )
         bindService(intent,connection,Context.BIND_AUTO_CREATE)
@@ -116,7 +145,8 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     //视图不可见接触绑定 同时其他的view绑定了当前的service
     override fun onPause() {
         super.onPause()
-        presenter.musicService.reMoveView()
+        reMovePre(presenter)
+        reMoveView(this)
         Log.e(TAG, "开始断开连接" )
         unbindService(connection)
         //setViewStatus(false)
@@ -132,9 +162,9 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     override fun serviceRefresh(songName: String, singer: String, imageUrl: String, duration: Int, currentTime: Int, songId: String) {
         MyToast().sendToast(this,singer+"FavoritesActivity",Toast.LENGTH_SHORT)
             if (getIsPlaying()){
-                bottom_pause_or_play.setImageResource(R.drawable.play)
+                resume(currentTime.toFloat()/duration)
             }else{
-                bottom_pause_or_play.setImageResource(R.drawable.pause)
+                pause()
             }
             bottom_song_name.text=songName
             Glide.with(this).load(imageUrl).into(bottom_song_image)

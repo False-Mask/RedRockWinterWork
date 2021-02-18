@@ -19,8 +19,12 @@ import java.io.Serializable
 private var musicService=MyMusicService()
 var MusicRefreshJob= Job()
 var MusicRefreshThread= CoroutineScope(MusicRefreshJob)
+//连接成功的view集合
 private var songUiList= mutableListOf<IServiceBindView>()
+//连接成功的presenter的集合
+private var songPreList= mutableListOf<IServiceBindPresenter>()
 private var position:Int=0
+//正在播放的歌单
 private var songList:MutableList<ServiceSong>?=null
 private var song:ServiceSong?=null
 
@@ -39,6 +43,14 @@ fun addView(view:IServiceBindView){
 }
 fun reMoveView(view: IServiceBindView){
     songUiList.remove(view)
+}
+
+fun addPresenter(pre:IServiceBindPresenter){
+    songPreList.add(pre)
+}
+
+fun reMovePre(pre:IServiceBindPresenter){
+    songPreList.add(pre)
 }
 
 //获取一些MediaPlayer基本属性
@@ -152,17 +164,24 @@ class MyMusicService : Service()
         Loopering,PlayInOrderNext,PlayInOrderLast
     }
 
-    //添加绑定的视图
-    fun addBindView(songUiActivity:IServiceBindView){
-        this.songUi=songUiActivity
-    }
+//    //添加绑定的视图
+//    fun addBindView(songUiActivity:IServiceBindView){
+//        this.songUi=songUiActivity
+//    }
 
     fun addBindPresenter(songPresenter:IServiceBindPresenter){
         this.songPre=songPresenter
     }
 
-    fun doForAll(block:IServiceBindView.()->Unit){
+    private fun doForAllView(block:IServiceBindView.()->Unit){
         for (x in songUiList){
+            x.block()
+        }
+    }
+
+    @JvmName("doForAll1")
+    private fun doForAllPre(block:IServiceBindPresenter.()->Unit){
+        for (x in songPreList){
             x.block()
         }
     }
@@ -206,6 +225,10 @@ class MyMusicService : Service()
                     setDataSource(songUrl)
                     //准备播放(异步准备)
                     prepareAsync()
+                    //告诉pre开始准备
+                    doForAllPre {
+                        onPreparing()
+                    }
                     //配置一堆监听
                     mediaPlayer.apply {
                         setOnPreparedListener(this@MyMusicService)
@@ -222,6 +245,9 @@ class MyMusicService : Service()
     //开始播放音乐
    private fun startMusic(){
         if (!mediaPlayer.isPlaying){
+            doForAllPre {
+                onStarted()
+            }
             mediaPlayer.start()
             //开始刷新 每1秒刷新一次
             //允许刷新
@@ -229,8 +255,12 @@ class MyMusicService : Service()
             refreshMusicPlayerStatus()
         }
     }
+
     //start
      fun pauseToStart(){
+        doForAllPre {
+            onResume()
+        }
         mediaPlayer.start()
     }
 
@@ -258,7 +288,7 @@ class MyMusicService : Service()
                     //songUi?.sendToast("未找到该资源")
                     //把图标变回来
                     //songUi?.iconChangeToPause()
-                    doForAll {
+                    doForAllView {
                         sendToast("未找到该资源")
                         iconChangeToPause()
                     }
@@ -269,19 +299,20 @@ class MyMusicService : Service()
                     //songUi?.sendToast("音乐解码错误")
                     //把图标变回来
                     //songUi?.iconChangeToPause()
-                    doForAll {
+                    doForAllView {
                         iconChangeToPause()
                     }
                     comeAcrossError()
                 }
                 "null"-> withContext(Main){
-                    doForAll {
+                    doForAllView {
                         sendToast("好像没找到资源~")
                     }
                 }
                 // 3 成功
                 else-> {
                     withContext(Main){
+
                         prepareMusicByNet(songUrl)
                     }
                 }
@@ -314,7 +345,7 @@ class MyMusicService : Service()
                     delay(1000)
                     if (doRefreshing){
                         withContext(Main){
-                            doForAll {
+                            doForAllView {
                                 serviceRefresh  (serviceData.songName,
                                         serviceData.singer,
                                         serviceData.Imageurl,
@@ -333,6 +364,9 @@ class MyMusicService : Service()
 
     //暂停音乐
     fun pauseMusic() {
+        doForAllPre {
+            onPause()
+        }
         mediaPlayer.pause()
     }
     //跳转播放
@@ -376,10 +410,10 @@ class MyMusicService : Service()
         }
     }
 
-    //缓存更新的时候回调
-    override fun onBufferingUpdate(mp: MediaPlayer?, percent: Int) {
-        songUi?.setBufferedProgress(percent)
-    }
+//    //缓存更新的时候回调
+//    override fun onBufferingUpdate(mp: MediaPlayer?, percent: Int) {
+//        songUi?.setBufferedProgress(percent)
+//    }
     override fun onCompletion(mp: MediaPlayer?) {
         //音乐播放完成
         //表明添加的是songList
@@ -435,9 +469,8 @@ class MyMusicService : Service()
 
     //准备完成的回调
     override fun onPrepared(mp: MediaPlayer?) {
-
         startMusic()
-        doForAll {
+        doForAllView {
             setMusicMaxProgress(getDuration())
         }
     }
@@ -447,9 +480,9 @@ class MyMusicService : Service()
         songPre.onMusicSeekComplete(mp)
     }
 
-    fun reMoveView() {
-        songUi= null
-    }
+//    fun reMoveView() {
+//        songUi= null
+//    }
 
     //返回的数据
     data class ServiceBackData(var songName: String="",
@@ -458,6 +491,10 @@ class MyMusicService : Service()
                                var duration: Int=0,
                                var currentTime: Int=0,
                                var songId: String=""){
+
+    }
+
+    override fun onBufferingUpdate(mp: MediaPlayer?, percent: Int) {
 
     }
 }

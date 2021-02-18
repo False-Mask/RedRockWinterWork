@@ -12,5 +12,9 @@ interface IServiceBindPresenter {
 
     //拖动完成的时候的回调
     fun onMusicSeekComplete(mp: MediaPlayer?)
+    fun onStarted()
+    fun onPreparing()
+    fun onPause()
+    fun onResume()
 
 }

@@ -1,4 +1,5 @@
 package com.example.neteasecloudmusic
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
@@ -20,10 +21,9 @@ import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netJob
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
+import com.example.neteasecloudmusic.view.PlayPauseIcon
+import kotlinx.android.synthetic.main.activity_favorites.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.first_fragment_layout.*
-import kotlinx.android.synthetic.main.rv_song_first.*
-import kotlinx.android.synthetic.main.second_fragment_layout.*
 import kotlinx.android.synthetic.main.activity_main.user_text as user_text1
 
 //NetWorkChangeImp是网络变化的监听
@@ -36,6 +36,9 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     private var myListener=NetWorkChangeImp
 
     private lateinit var connection:ServiceConnection
+
+    var animator:ObjectAnimator?=null
+
 
     val TAG="MainActivity"
     //初始化presenter
@@ -66,7 +69,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     }
 
     private fun initClick() {
-        bottom_play_pause_main.setOnClickListener(presenter)
+        bottom_play_pause_main.addOnViewClickListener(presenter)
         bottom_song_image_main.setOnClickListener(presenter)
         bottom_song_name_main.setOnClickListener(presenter)
         bottom_next_song.setOnClickListener(presenter)
@@ -153,6 +156,29 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         startActivity(intent)
     }
 
+    override fun resume(fl: Float) {
+        bottom_play_pause_main.status=PlayPauseIcon.PlayStatus.Playing
+        bottom_play_pause_main.progressPercent=fl
+    }
+
+    override fun pause() {
+        animator?.cancel()
+        bottom_play_pause_main.status=PlayPauseIcon.PlayStatus.Pausing
+    }
+
+    override fun preparing() {
+        bottom_play_pause_main.status=PlayPauseIcon.PlayStatus.Loading
+        animator?.apply {
+            duration=1000
+            repeatCount=-1
+            start()
+        }
+    }
+
+    override fun start() {
+        bottom_play_pause_main.status=PlayPauseIcon.PlayStatus.Playing
+    }
+
 
     //隐藏所有的Fragment
     //由于Fragment在replace以后实例不变 但是界面会刷新 这样体验不太好
@@ -169,12 +195,14 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         val intent=Intent(this,MyMusicService::class.java)
         bindService(intent,connection, Context.BIND_AUTO_CREATE)
         addView(this)
+        addPresenter(presenter)
     }
 
     override fun onPause() {
         super.onPause()
         //移除免得调用
-        presenter.musicService.reMoveView()
+        reMoveView(this)
+        reMovePre(presenter)
         unbindService(connection)
         Log.d(TAG, "断开连接")
         reMoveView(this)
@@ -183,9 +211,9 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     //service的接口
     override fun serviceRefresh(songName: String, singer: String, imageUrl: String, duration: Int, currentTime: Int, songId: String) {
         if (getIsPlaying()){
-            bottom_play_pause_main.setImageResource(R.drawable.play)
+            resume(currentTime.toFloat()/duration)
         }else{
-            bottom_play_pause_main.setImageResource(R.drawable.pause)
+            pause()
         }
         Glide.with(this).load(imageUrl).into(bottom_song_image_main)
         bottom_song_name_main.text=songName
@@ -203,7 +231,6 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     }
 
     override fun setBufferedProgress(percent: Int) {
-
     }
 
 

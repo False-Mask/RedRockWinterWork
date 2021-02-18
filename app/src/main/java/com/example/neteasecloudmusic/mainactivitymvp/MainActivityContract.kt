@@ -12,6 +12,10 @@ interface MainActivityContract {
     interface MainActivityIView{
         fun initFragment()
         fun loopToSongUi()
+        fun resume(fl: Float)
+        fun pause()
+        fun preparing()
+        fun start()
     }
     interface MainActivityPresenter{
         fun loginAuto()

@@ -18,9 +18,7 @@ import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadObjectFile
 import com.example.neteasecloudmusic.mytools.filedownload.imagePath
 import com.example.neteasecloudmusic.mytools.filedownload.readObjectFile
-import com.example.neteasecloudmusic.mytools.musicservice.IServiceBindPresenter
-import com.example.neteasecloudmusic.mytools.musicservice.MyMusicService
-import com.example.neteasecloudmusic.mytools.musicservice.getIsPlaying
+import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
@@ -28,6 +26,7 @@ import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.recyclerview.favorites.Favorites
 import com.example.neteasecloudmusic.recyclerview.favorites.list
 import com.example.neteasecloudmusic.userfragmentmvp.rvAdapter
+import com.example.neteasecloudmusic.view.PlayPauseIcon
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
@@ -45,7 +44,7 @@ const val BannerDataObjectName="BannerData"
 const val BaseBannerImageFileName="banner"
 class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainActivityPresenter
         , IServiceBindPresenter,ServiceConnection
-        ,View.OnClickListener{
+        ,View.OnClickListener, PlayPauseIcon.Click {
 
     val TAG = "MainActivityPresenter"
     var view = activity
@@ -64,6 +63,22 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
     override fun onMusicSeekComplete(mp: MediaPlayer?) {
     }
 
+    override fun onStarted() {
+        view.start()
+    }
+
+    override fun onPreparing() {
+        view.preparing()
+    }
+
+    override fun onPause() {
+        view.pause()
+    }
+
+    override fun onResume() {
+        view.resume(getCurrentPosition().toFloat()/ getDuration())
+    }
+
     override fun onServiceDisconnected(name: ComponentName?) {
         Log.e(TAG, "连接失败" )
     }
@@ -71,7 +86,6 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Log.e(TAG, "连接成功" )
         musicService=(service as MyMusicService.MyBinder).getService()
-        musicService.addBindView(view)
         musicService.addBindPresenter(this)
     }
 
@@ -190,6 +204,22 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
             R.id.bottom_song_name_main,R.id.bottom_song_image_main
                 ->{
                 view.loopToSongUi()
+            }
+        }
+    }
+
+    override fun onPlayPauseViewClick(v: View) {
+        val v2=v as PlayPauseIcon
+        when(v2.status){
+            PlayPauseIcon.PlayStatus.Playing->{
+                musicService.pauseMusic()
+                onPause()
+            }
+            PlayPauseIcon.PlayStatus.Pausing->{
+                musicService.pauseToStart()
+                onResume()
+            }else->{
+
             }
         }
     }

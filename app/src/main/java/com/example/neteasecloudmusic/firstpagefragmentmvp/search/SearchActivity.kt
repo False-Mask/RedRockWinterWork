@@ -1,18 +1,17 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp.search
 
-import android.content.ComponentName
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.IBinder
-import android.util.Log
+import android.view.animation.LinearInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
@@ -20,15 +19,15 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
+import com.example.neteasecloudmusic.view.PlayPauseIcon
 import kotlinx.android.synthetic.main.activity_search.*
-import kotlinx.android.synthetic.main.activity_song_ui.*
 
 class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBindView{
 
    companion object{
        const val TAG="SearchActivity"
    }
-
+    private var animator: ObjectAnimator?=null
     val presenter=SearchPresenter(this)
     private val connection=presenter as ServiceConnection
 
@@ -37,6 +36,7 @@ class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        search_play_or_pause.addOnViewClickListener(presenter)
 
         search_text_sa.apply {
             isFocusable=true
@@ -63,12 +63,14 @@ class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBi
 override fun onPause() {
         super.onPause()
         reMoveView(this)
+        reMovePre(presenter)
         unbindService(connection)
 }
 
     override fun onStart() {
         super.onStart()
         addView(this)
+        addPresenter(presenter)
         val intent=Intent(this,MyMusicService::class.java)
         bindService(intent,connection, Context.BIND_AUTO_CREATE)
     }
@@ -84,9 +86,15 @@ override fun onPause() {
     ) {
             Glide.with(this).load(imageUrl).apply(RequestOptions.bitmapTransform(CircleCrop())).into(search_song_image)
         search_song_text.text=songName
-        if (getIsPlaying()){
-            search_play_or_pause.setImageResource(R.drawable.play)
-        }else{
+        val status=search_play_or_pause.status
+        if (status==PlayPauseIcon.PlayStatus.Playing){
+            if (getCurrentPosition()<=0){
+                start()
+            }else{
+                resume(currentTime.toFloat()/duration)
+            }
+
+        }else if (status==PlayPauseIcon.PlayStatus.Pausing){
             iconChangeToPause()
         }
     }
@@ -100,10 +108,29 @@ override fun onPause() {
     }
 
     override fun iconChangeToPause() {
-        search_play_or_pause.setImageResource(R.drawable.pause)
+        search_play_or_pause.status=PlayPauseIcon.PlayStatus.Pausing
     }
 
     override fun setBufferedProgress(percent: Int) {
 
+    }
+
+    override fun resume(percent: Float) {
+        search_play_or_pause.status=PlayPauseIcon.PlayStatus.Playing
+        search_play_or_pause.progressPercent=percent
+    }
+
+    override fun loading() {
+        search_play_or_pause.status=PlayPauseIcon.PlayStatus.Loading
+        animator=ObjectAnimator.ofFloat(search_play_or_pause,"angle",0f,360f)
+        animator?.duration=1000
+        animator?.repeatCount=-1
+        animator?.interpolator=LinearInterpolator()
+        animator?.start()
+    }
+
+    override fun start() {
+        animator?.cancel()
+        search_play_or_pause.status=PlayPauseIcon.PlayStatus.Playing
     }
 }

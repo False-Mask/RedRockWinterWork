@@ -16,6 +16,9 @@ interface SongContract {
         //改变进度条
         fun setBufferedBarPercent(percent: Int)
         fun back()
+        fun resume(percent: Float)
+        fun loading()
+        fun start()
     }
     interface SongIPresenter{
         fun pauseOrPlay(

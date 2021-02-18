@@ -30,16 +30,6 @@
             app:layout_constraintStart_toEndOf="@+id/bottom_song_image_main"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/bottom_play_pause_main"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline33"
-            app:layout_constraintStart_toStartOf="@+id/guideline37"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/pause" />
-
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline32"
             android:layout_width="wrap_content"
@@ -83,7 +73,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/bottom_play_pause_main"
+            app:layout_constraintEnd_toStartOf="@+id/guideline37"
             app:layout_constraintStart_toStartOf="@+id/guideline39"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/last" />
@@ -92,11 +82,22 @@
             android:id="@+id/bottom_next_song"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:scrollbarThumbVertical="@drawable/next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/bottom_play_pause_main"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/next" />
+
+        <com.example.neteasecloudmusic.view.PlayPauseIcon
+            android:id="@+id/bottom_play_pause_main"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline33"
+            app:layout_constraintHorizontal_bias="0.56"
+            app:layout_constraintStart_toStartOf="@+id/guideline37"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

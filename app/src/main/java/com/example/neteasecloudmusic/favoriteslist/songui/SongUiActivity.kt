@@ -96,6 +96,17 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
         finish()
     }
 
+    override fun resume(percent: Float) {
+
+    }
+
+    override fun loading() {
+    }
+
+    override fun start() {
+
+    }
+
     //发送toast
     override fun sendToast(text: String) {
         MyToast().sendToast(this,text,Toast.LENGTH_SHORT)
@@ -137,6 +148,7 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     override fun onStart() {
         super.onStart()
         addView(this)
+        addPresenter(presenter)
         //绑定
         val intent= Intent(this, MyMusicService::class.java)
         //绑定后自动创建
@@ -147,6 +159,7 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     override fun onPause() {
         super.onPause()
         reMoveView(this)
+        reMovePre(presenter)
         unbindService(connection)
     }
 }
