@@ -27,7 +27,7 @@ class PlayPauseBar @JvmOverloads constructor(
     //view 宽高中最小的一个
     var layoutMin=0
     //view的最外圈半径的长度
-    var r=0
+    private var r=0
 
     //中心位置的坐标
     var centerX=0f
@@ -138,7 +138,7 @@ class PlayPauseBar @JvmOverloads constructor(
 
         //外部的加载
         //drawLoadingArc(canvas)
-       Log.e(TAG, "Invalidating~~$angle")
+       //Log.e(TAG, "Invalidating~~$angle")
 
         //drawPlayArcBar(canvas)
 

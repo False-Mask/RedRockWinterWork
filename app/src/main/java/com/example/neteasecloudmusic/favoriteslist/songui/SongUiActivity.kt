@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.favoriteslist.songui
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
@@ -14,6 +15,7 @@ import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.mytools.changMsIntoMinutesAndSecond
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
+import com.example.neteasecloudmusic.view.PlayPauseBar
 import kotlinx.android.synthetic.main.activity_song_ui.*
 import kotlinx.android.synthetic.main.rv_song_list_item.*
 import java.lang.Exception
@@ -39,12 +41,12 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
 
 
         try {
-            //初始化值
-            intent.extras?.apply {
-                position=getInt("position")
-                song= getSerializable("song") as ServiceSong
-                songs=(getSerializable("songs") as ServiceSongList).mSongs
-            }
+//            //初始化值
+//            intent.extras?.apply {
+//                position=getInt("position")
+//                song= getSerializable("song") as ServiceSong
+//                songs=(getSerializable("songs") as ServiceSongList).mSongs
+//            }
         }catch (e:Exception){
             Log.e(TAG, "空指针异常", e)
         }
@@ -65,13 +67,13 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
         song_ui_back_icon.setOnClickListener(presenter)
 
         //  播放/暂停键
-        play_pause_icon.setOnClickListener(presenter)
+        play_pause_icon.addOnViewClickListener(presenter)
 
         //下一首
-        the_next_song_icon.setOnClickListener(presenter)
+        the_next_song_icon.addOnIconClickListener(presenter)
 
         //上一首
-        the_last_song_icon.setOnClickListener(presenter)
+        the_last_song_icon.addOnIconClickListener(presenter)
 
         //SeekBar的监控
         song_ui_seek_bar.setOnSeekBarChangeListener(presenter)
@@ -80,31 +82,37 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
 
     //图标由pause状态改为play
     override fun iconChangeToPlay() {
-        play_pause_icon.setImageResource(R.drawable.play)
+        play_pause_icon.status=PlayPauseBar.PlayStatus.Playing
+        //play_pause_icon.setImageResource(R.drawable.play)
     }
 
     //图标由play改为pause
     override fun iconChangeToPause() {
-        play_pause_icon.setImageResource(R.drawable.pause)
+        play_pause_icon.status=PlayPauseBar.PlayStatus.Pausing
+        //play_pause_icon.setImageResource(R.drawable.pause)
     }
     //暂时放弃
-    override fun setBufferedProgress(percent: Int) {
-
-    }
+    override fun setBufferedProgress(percent: Int) {}
 
     override fun back() {
         finish()
     }
 
-    override fun resume(percent: Float) {
-
-    }
+    override fun resume(percent: Float) {}
 
     override fun loading() {
+        animator=ObjectAnimator.ofFloat(play_pause_icon,"angle",0f,360f)
+        animator?.apply {
+            duration=1000
+            repeatCount=-1
+            start()
+        }
     }
 
+    var animator: ObjectAnimator? =null
     override fun start() {
-
+        play_pause_icon.status=PlayPauseBar.PlayStatus.Playing
+        animator?.cancel()
     }
 
     //发送toast
@@ -112,8 +120,7 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
         MyToast().sendToast(this,text,Toast.LENGTH_SHORT)
     }
 
-    override fun setBufferedBarPercent(percent: Int) {
-    }
+    override fun setBufferedBarPercent(percent: Int) {}
 
 
     override fun setMusicMaxProgress(duration: Int) {
@@ -137,9 +144,10 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
         total_song_progress.text= changMsIntoMinutesAndSecond(duration)
         current_song_progress.text= changMsIntoMinutesAndSecond(currentTime)
         if(getIsPlaying()){
-            play_pause_icon.setImageResource(R.drawable.play)
+
+            play_pause_icon.status=PlayPauseBar.PlayStatus.Playing
         }else{
-            play_pause_icon.setImageResource(R.drawable.pause)
+            play_pause_icon.status=PlayPauseBar.PlayStatus.Pausing
         }
 
     }

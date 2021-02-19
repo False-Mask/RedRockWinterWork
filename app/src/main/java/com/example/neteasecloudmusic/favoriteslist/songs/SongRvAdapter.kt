@@ -133,7 +133,6 @@ class SongRvAdapter : RecyclerView.Adapter<SongRvAdapter.Holder>() {
                 songList.size - 1 -> {
                     holder.view?.setOnClickListener {
                         listener.tailClicked(view)
-                        Log.e("最后一个白板", "onBindViewHolder: ")
                     }
                 }
                 //song

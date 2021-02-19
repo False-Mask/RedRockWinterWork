@@ -100,18 +100,21 @@ class FragmentPresenter(firstFragment: FirstFragment) :FirstFragmentContract.Fir
 
 
     //创建布局管理器
-    val layoutManager= GridLayoutManager(context,6)
+    private val layoutManager= GridLayoutManager(context,6)
 
     override fun initRecyclerView() {
+        if (multiList.isNotEmpty()){
+            multiList.clear()
+        }
 
         //发送获取其他的数据
-        netThread.launch (Dispatchers.IO){
+        netThread.launch (IO){
             //第一步获取 banner数据
             val step1=async { getBanner() }
             //第二步获取 小大列表对应的数据
             val step2=async { getRecommendFavorites() }
             //第三步获取 网友精选歌单
-            val step3=async { getTopFavorites() }
+            val step3=async { getTopFavorites("(multiList[12] as TopData).updateTime",false) }
 
             //获取数据
             val data1=step1.await()
@@ -178,14 +181,21 @@ class FragmentPresenter(firstFragment: FirstFragment) :FirstFragmentContract.Fir
     }
 
     //发送并获取歌单
-    private suspend fun getTopFavorites(): MutableList<TopData> {
-        val url=model.getTopFavorites(System.currentTimeMillis().toString())
+    private suspend fun getTopFavorites(updateTime: String, b: Boolean): MutableList<TopData> {
+        val url:String = if(b){
+            model.getTopFavorites(updateTime)
+        }
+        else{
+            model.getTopFavorites(System.currentTimeMillis().toString())
+        }
+
+
         val respondBody= sendGetRequest(url)
         model.topFavorites=Gson().fromJson(respondBody,TopFavorites::class.java)
         val data=model.topFavorites
         val topList= mutableListOf<TopData>()
         for (i in data.playlists){
-            topList.add(TopData(i.name,i.coverImgUrl,i.id.toString()))
+            topList.add(TopData(i.name,i.coverImgUrl,i.id.toString(),i.updateTime.toString()))
         }
         return topList
     }
@@ -313,30 +323,39 @@ class FragmentPresenter(firstFragment: FirstFragment) :FirstFragmentContract.Fir
             view.sendToast("正在解析数据请稍后")
             view.setFreshOff()
         }else{
-            netThread.launch(IO) {
-                //
-                val job1=async { getTopFavorites() }
-                //刷新相关音乐面板
-                val (refresh1,refresh2)=refreshRecommendData()
+            if (multiList.size!=13){
+                initRecyclerView()
+            }else{
+                netThread.launch(IO) {
+                    //说明5个都满了
+                    val job1:Deferred<MutableList<TopData>> = if (multiList.size>=13){
+                        async { getTopFavorites((multiList[12] as TopData).updateTime,true) }
+                    }else{
+                        async { getTopFavorites("(multiList[12] as TopData).updateTime", false) }
+                    }
+                    //刷新相关音乐面板
+                    val (refresh1,refresh2)=refreshRecommendData()
 
-                //await
-                val refresh3=job1.await()
+                    //await
+                    val refresh3=job1?.await()
 
-                //刷新小的音乐页面
-                for (x in 2..4)  multiList[x] = refresh1[x-2]
-                //刷新大的音乐面板
-                for (x in 5..6)  multiList[x] = refresh2[x-5]
-                //刷新网友精选歌单
-                for (x in 8..12) multiList[x] = refresh3[x-8]
-                //设置list
-                multiRvAdapter?.setMultiList(multiList)
-                //提示adapter改变数据
-                withContext(Main){
-                    multiRvAdapter?.notifyDataSetChanged()
+                    //刷新小的音乐页面
+                    for (x in 2..4)  multiList[x] = refresh1[x-2]
+                    //刷新大的音乐面板
+                    for (x in 5..6)  multiList[x] = refresh2[x-5]
+                    //刷新网友精选歌单
+                    for (x in 8..12) multiList[x] = refresh3[x-8]
+                    //设置list
+                    multiRvAdapter?.setMultiList(multiList)
+                    //提示adapter改变数据
+                    withContext(Main){
+                        multiRvAdapter?.notifyDataSetChanged()
+                    }
+
+                    view.setFreshOff()
                 }
-
-                view.setFreshOff()
             }
+
         }
     }
 

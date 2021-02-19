@@ -88,13 +88,13 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
                 try {
                     var artist: String
                     //图片地址
-                    val image: String = song.al.picUrl
+                    val image: String = song.artists[0].img1v1Url
                     //歌曲id
                     val songId: String = song.id.toString()
                     //歌曲名称
                     val songName: String = song.name
                     //获取歌曲对应的歌手列表
-                    val artistsData = song.ar
+                    val artistsData = song.artists
                     //解析歌曲的内容
                     val z = StringBuilder()
                     for (x in artistsData.indices) {

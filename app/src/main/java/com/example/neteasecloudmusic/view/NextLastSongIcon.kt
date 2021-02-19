@@ -178,12 +178,12 @@ class NextLastSongIcon @JvmOverloads constructor(
                 if (event.x>= 0 && event.x<=width && event.y >=0 && event.y<= height){
                     click?.onIconClicked(this)
                 }
-                Log.e("TAG", "up" )
+                //Log.e("TAG", "up" )
             }
 
             MotionEvent.ACTION_DOWN -> {
                 drawType = DrawType.Pressed
-                Log.e("TAG", "down")
+                //Log.e("TAG", "down")
             }
 
         }

@@ -187,14 +187,14 @@ class FavoritesModel :FavoritesContract.FavoritesIModel{
         var br: Int = 0,
         var fid: Int = 0,
         var size: Int = 0,
-        var vd: Int = 0
+        var vd: Double = 0.0
     )
 
     data class M(
         var br: Int = 0,
         var fid: Int = 0,
         var size: Int = 0,
-        var vd: Int = 0
+        var vd: Double = 0.0
     )
 
     data class ChargeInfo(

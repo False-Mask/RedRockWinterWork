@@ -25,6 +25,7 @@ import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
 import com.example.neteasecloudmusic.view.PlayPauseBar
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.Exception
 import kotlinx.android.synthetic.main.activity_main.user_text as user_text1
 
 //NetWorkChangeImp是网络变化的监听
@@ -86,6 +87,17 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         super.onDestroy()
         connectivityManager.unregisterNetworkCallback(myListener)
         netJob.cancel()
+
+        //移除免得调用
+        reMoveView(this)
+        reMovePre(presenter)
+        try{
+            unbindService(connection)
+        }catch (e:Exception){
+            Log.e(TAG, "服务器解绑故障", e)
+        }
+
+        Log.d(TAG, "断开连接")
     }
     //网络监听的初始化
     private fun registerNetListener() {
@@ -197,20 +209,29 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     override fun onStart() {
         super.onStart()
         val intent=Intent(this,MyMusicService::class.java)
-        bindService(intent,connection, Context.BIND_AUTO_CREATE)
+        try {
+            bindService(intent,connection, Context.BIND_AUTO_CREATE)
+        }catch (e:Exception){
+            Log.e(TAG, "绑定服务故障",e )
+        }
+
         addView(this)
         addPresenter(presenter)
     }
 
-    override fun onPause() {
-        super.onPause()
-        //移除免得调用
-        reMoveView(this)
-        reMovePre(presenter)
-        unbindService(connection)
-        Log.d(TAG, "断开连接")
-        reMoveView(this)
-    }
+//    override fun onPause() {
+//        super.onPause()
+//        //移除免得调用
+//        reMoveView(this)
+//        reMovePre(presenter)
+//        try{
+//            unbindService(connection)
+//        }catch (e:Exception){
+//            Log.e(TAG, "服务器解绑故障", e)
+//        }
+//
+//        Log.d(TAG, "断开连接")
+//    }
 
     var circleCrop=RequestOptions.bitmapTransform(CircleCrop())
     //service的接口
@@ -220,7 +241,9 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         }else{
             pause()
         }
-        Glide.with(this).load(imageUrl).circleCrop().into(bottom_song_image_main)
+        Glide.with(this).load(imageUrl).circleCrop()
+                .error(R.drawable.music_place_holder)
+                .placeholder(R.drawable.music_place_holder).into(bottom_song_image_main)
         bottom_song_name_main.text=songName
     }
 

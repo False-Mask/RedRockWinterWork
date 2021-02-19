@@ -27,17 +27,17 @@ class LoginByPhoneActivity : AppCompatActivity() ,ByPhoneContract.ByPhoneIView{
         }
         //注册账号
         register_user_account.setOnClickListener{
-            var intent=Intent(this,RegisterActivity::class.java)
+            val intent=Intent(this,RegisterActivity::class.java)
             startActivity(intent)
         }
 
         //用户登陆
         login_button.setOnClickListener{
             Log.d(TAG, "onCreate: ")
-            MyToast().sendToast(this,"你点击了login",Toast.LENGTH_SHORT)
+
             //获取edit的手机和密码
-            var phoneNumber=edit_phone_1.text.toString()
-            var passwordText=edit_phone_2.text.toString()
+            val phoneNumber=edit_phone_1.text.toString()
+            val passwordText=edit_phone_2.text.toString()
             presenter.loginClicked(phoneNumber,passwordText)
         }
 

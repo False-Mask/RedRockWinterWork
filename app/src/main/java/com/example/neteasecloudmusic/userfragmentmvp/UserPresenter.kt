@@ -107,6 +107,5 @@ class UserPresenter(fragment:UserFragment) :UserContract.UserIPresenter
         intent.putExtra("is_send_user_id",true)
 
         view.favoritesClicked(v,position,intent)
-        MyToast().sendToast(mContext,"${position}被点击",Toast.LENGTH_SHORT)
     }
 }

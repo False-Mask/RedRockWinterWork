@@ -1,6 +1,5 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.adapter
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView

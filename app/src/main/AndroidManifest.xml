@@ -27,13 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".favoriteslist.songui.SongUiActivity" />
-        <activity android:name=".favoriteslist.FavoritesActivity" />
-        <activity android:name=".useui.UserUiActivity" />
-        <activity android:name=".register.RegisterActivity" />
-        <activity android:name=".loginactivity.LoginByCloudActivity" />
-        <activity android:name=".loginactivity.loginbyphone.LoginByPhoneActivity" />
-        <activity android:name=".loginactivity.LoginActivity" />
+        <activity android:name=".favoriteslist.songui.SongUiActivity" android:launchMode="singleTop" />
+        <activity android:name=".favoriteslist.FavoritesActivity" android:launchMode="singleTop" />
+        <activity android:name=".useui.UserUiActivity"  android:launchMode="singleTop"/>
+        <activity android:name=".register.RegisterActivity" android:launchMode="singleTop"/>
+        <activity android:name=".loginactivity.LoginByCloudActivity" android:launchMode="singleTop"/>
+        <activity android:name=".loginactivity.loginbyphone.LoginByPhoneActivity" android:launchMode="singleTop"/>
+        <activity android:name=".loginactivity.LoginActivity" android:launchMode="singleTop"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

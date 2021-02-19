@@ -67,6 +67,7 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
         search_text.setOnClickListener(presenter)
 
         presenter.initRecyclerView()
+
 //        //发送获取其他的数据
 //        netThread.launch (IO){
 //            bannerData.netList=presenter.getBanner()

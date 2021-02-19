@@ -28,7 +28,7 @@ object BannerTools {
                     withContext(Dispatchers.Main){
                         viewPager?.setCurrentItem(current,true)
                     }
-                    Log.e("TAG", "开始banner了$current")
+                    //Log.e("TAG", "开始banner了$current")
                 }
                 //刷新终止后允许刷新
                 flag=false

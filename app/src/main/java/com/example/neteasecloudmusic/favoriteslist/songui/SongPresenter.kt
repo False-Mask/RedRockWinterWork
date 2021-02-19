@@ -11,8 +11,10 @@ import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.songs.Song
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
+import com.example.neteasecloudmusic.view.NextLastSongIcon
 import com.example.neteasecloudmusic.view.PlayPauseBar
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.activity_song_ui.*
 import kotlinx.coroutines.*
 
 var songJob= Job()
@@ -22,7 +24,7 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         ,SeekBar.OnSeekBarChangeListener
         ,ServiceConnection
         ,View.OnClickListener, IServiceBindPresenter
-,PlayPauseBar.Click{
+,PlayPauseBar.Click, NextLastSongIcon.Click {
     val TAG="SongPresenter"
     var view=activity
     var model=SongModel()
@@ -363,6 +365,18 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         this.songPlayList=songs
         this.position=position
         this.song=songPlayList[position]
+    }
+
+    override fun onIconClicked(v: View) {
+        when(v.id){
+            R.id.the_next_song_icon->{
+                musicService.playNextSong()
+            }
+
+            R.id.the_last_song_icon->{
+                musicService.playLastSong()
+            }
+        }
     }
 
 }

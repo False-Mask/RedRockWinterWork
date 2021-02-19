@@ -27,10 +27,10 @@ class ByPhonePresenter (activity:LoginByPhoneActivity): ByPhoneContract.ByPhoneI
         override fun loginClicked(phoneNumber: String, passwordText: String) {
                 //进度条转起来
                 view.progressOn()
-                var url=model.login(phoneNumber,passwordText)
+                val url=model.login(phoneNumber,passwordText)
                 netThread.launch(Dispatchers.IO) {
                         try {
-                                var respondBody=sendGetRequest(url)
+                                val respondBody=sendGetRequest(url)
                                 loginResult=Gson().fromJson(respondBody,ByPhoneModel.LoginResult::class.java)
                                 //
                                 if (loginResult.code==200){
@@ -39,7 +39,7 @@ class ByPhonePresenter (activity:LoginByPhoneActivity): ByPhoneContract.ByPhoneI
                                         //下载背景
                                         downLoadImage(BackGroundName, loginResult.profile?.backgroundUrl!!)
                                         //将用户的缓存数据通过文件流下载下来
-                                        var mData=LoginCathe(File("$imagePath/$HeadShowName.jpg")
+                                        val mData=LoginCathe(File("$imagePath/$HeadShowName.jpg")
                                         , loginResult.profile?.nickname!!,phoneNumber,passwordText, File("$imagePath/$BackGroundName.jpg"), loginResult.cookie)
                                         downLoadObjectFile(MyLoginCatheObjectFileName,mData)
                                         Log.d(TAG, "loginClicked: LoginCathe下载完成")
@@ -66,6 +66,7 @@ class ByPhonePresenter (activity:LoginByPhoneActivity): ByPhoneContract.ByPhoneI
                                                 UserPresenter(MainActivity.secondFragment).changeIconAndName(File("$imagePath/$HeadShowName.jpg")
                                                         ,nickname,phoneNumber,passwordText)
                                         }
+                                        MainActivity.firstFragment.presenter.initRecyclerView()
                                         //初始化歌单列表 还自动登陆欸
                                         MainActivity.presenter.loginAuto()
                                 }

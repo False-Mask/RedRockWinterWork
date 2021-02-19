@@ -84,7 +84,9 @@ override fun onPause() {
         currentTime: Int,
         songId: String
     ) {
-            Glide.with(this).load(imageUrl).apply(RequestOptions.bitmapTransform(CircleCrop())).into(search_song_image)
+            Glide.with(this).load(imageUrl)
+                    .error(R.drawable.music_place_holder)
+                    .placeholder(R.drawable.music_place_holder).apply(RequestOptions.bitmapTransform(CircleCrop())).into(search_song_image)
         search_song_text.text=songName
         val status=search_play_or_pause.status
         if (status==PlayPauseBar.PlayStatus.Playing){

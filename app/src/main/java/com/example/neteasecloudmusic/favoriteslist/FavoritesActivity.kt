@@ -18,6 +18,7 @@ import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.view.PlayPauseBar
 import kotlinx.android.synthetic.main.activity_favorites.*
+import java.lang.Exception
 
 class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
 ,IServiceBindView{
@@ -148,7 +149,12 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         reMovePre(presenter)
         reMoveView(this)
         Log.e(TAG, "开始断开连接" )
-        unbindService(connection)
+        try {
+            unbindService(connection)
+        }catch (e:Exception){
+            Log.e(TAG, "断开连接故障",e )
+        }
+
         //setViewStatus(false)
         reMoveView(this)
     }
@@ -160,14 +166,14 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     override fun setBufferedProgress(percent: Int) {}
 
     override fun serviceRefresh(songName: String, singer: String, imageUrl: String, duration: Int, currentTime: Int, songId: String) {
-        MyToast().sendToast(this,singer+"FavoritesActivity",Toast.LENGTH_SHORT)
             if (getIsPlaying()){
                 resume(currentTime.toFloat()/duration)
             }else{
                 pause()
             }
             bottom_song_name.text=songName
-            Glide.with(this).load(imageUrl).circleCrop().into(bottom_song_image)
+            Glide.with(this).load(imageUrl).placeholder(R.drawable.music_place_holder)
+                    .error(R.drawable.music_place_holder).circleCrop().into(bottom_song_image)
     }
 
     override fun sendToast(s: String) {

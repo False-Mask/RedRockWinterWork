@@ -12,129 +12,72 @@ class SearchModel :SearchContract.SearchIModel {
     }
 
 
+
+
     //搜到的数据
-    data class SearchResult(
+data class SearchResult(
     var code: Int = 0,
     var result: Result = Result()
 )
 
 data class Result(
+    var hasMore: Boolean = false,
     var songCount: Int = 0,
     var songs: List<Song> = listOf()
 )
 
 data class Song(
-    var a: Any? = Any(),
-    var al: Al = Al(),
-    var alia: List<String> = listOf(),
-    var ar: List<Ar> = listOf(),
-    var cd: String = "",
-    var cf: String = "",
-    var copyright: Int = 0,
-    var cp: Int = 0,
-    var crbt: Any? = Any(),
-    var djId: Int = 0,
-    var dt: Int = 0,
+    var album: Album = Album(),
+    var alias: List<String> = listOf(),
+    var artists: List<ArtistX> = listOf(),
+    var copyrightId: Int = 0,
+    var duration: Int = 0,
     var fee: Int = 0,
     var ftype: Int = 0,
-    var h: H? = H(),
     var id: Int = 0,
-    var l: L = L(),
-    var m: M? = M(),
-    var mark: Long = 0,
-    var mst: Int = 0,
-    var mv: Int = 0,
+    var mark: Int = 0,
+    var mvid: Int = 0,
     var name: String = "",
-    var no: Int = 0,
-    var noCopyrightRcmd: Any? = Any(),
-    var originCoverType: Int = 0,
-    var originSongSimpleData: Any? = Any(),
-    var pop: Int = 0,
-    var privilege: Privilege = Privilege(),
-    var pst: Int = 0,
-    var publishTime: Long = 0,
-    var rt: String? = "",
-    var rtUrl: Any? = Any(),
-    var rtUrls: List<Any> = listOf(),
+    var rUrl: Any? = Any(),
     var rtype: Int = 0,
-    var rurl: Any? = Any(),
-    var s_id: Int = 0,
-    var single: Int = 0,
-    var st: Int = 0,
-    var t: Int = 0,
-    var v: Int = 0
+    var status: Int = 0
 )
 
-data class Al(
-    var id: Int = 0,
-    var name: String = "",
-    var pic: Long = 0,
-    var picUrl: String = "",
-    var pic_str: String = "",
-    var tns: List<Any> = listOf()
-)
-
-data class Ar(
+data class Album(
     var alia: List<String> = listOf(),
-    var alias: List<String> = listOf(),
+    var artist: Artist = Artist(),
+    var copyrightId: Int = 0,
     var id: Int = 0,
+    var mark: Int = 0,
     var name: String = "",
-    var tns: List<Any> = listOf()
-)
-
-data class H(
-    var br: Int = 0,
-    var fid: Int = 0,
+    var picId: Long = 0,
+    var publishTime: Long = 0,
     var size: Int = 0,
-    var vd: Int = 0
+    var status: Int = 0
 )
 
-data class L(
-    var br: Int = 0,
-    var fid: Int = 0,
-    var size: Int = 0,
-    var vd: Int = 0
-)
-
-data class M(
-    var br: Int = 0,
-    var fid: Int = 0,
-    var size: Int = 0,
-    var vd: Int = 0
-)
-
-data class Privilege(
-    var chargeInfoList: List<ChargeInfo> = listOf(),
-    var cp: Int = 0,
-    var cs: Boolean = false,
-    var dl: Int = 0,
-    var downloadMaxbr: Int = 0,
-    var fee: Int = 0,
-    var fl: Int = 0,
-    var flag: Int = 0,
-    var freeTrialPrivilege: FreeTrialPrivilege = FreeTrialPrivilege(),
+data class ArtistX(
+    var albumSize: Int = 0,
+    var alias: List<Any> = listOf(),
     var id: Int = 0,
-    var maxbr: Int = 0,
-    var payed: Int = 0,
-    var pl: Int = 0,
-    var playMaxbr: Int = 0,
-    var preSell: Boolean = false,
-    var sp: Int = 0,
-    var st: Int = 0,
-    var subp: Int = 0,
-    var toast: Boolean = false
+    var img1v1: Int = 0,
+    var img1v1Url: String = "",
+    var name: String = "",
+    var picId: Int = 0,
+    var picUrl: Any? = Any(),
+    var trans: Any? = Any()
 )
 
-data class ChargeInfo(
-    var chargeMessage: Any? = Any(),
-    var chargeType: Int = 0,
-    var chargeUrl: Any? = Any(),
-    var rate: Int = 0
-)
-
-data class FreeTrialPrivilege(
-    var resConsumable: Boolean = false,
-    var userConsumable: Boolean = false
+data class Artist(
+    var albumSize: Int = 0,
+    var alias: List<Any> = listOf(),
+    var id: Int = 0,
+    var img1v1: Int = 0,
+    var img1v1Url: String = "",
+    var name: String = "",
+    var picId: Int = 0,
+    var picUrl: Any? = Any(),
+    var trans: Any? = Any()
 )
 
 
