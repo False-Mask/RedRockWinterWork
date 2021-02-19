@@ -16,7 +16,7 @@ import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.songs.SongRvAdapter
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
-import com.example.neteasecloudmusic.view.PlayPauseIcon
+import com.example.neteasecloudmusic.view.PlayPauseBar
 import kotlinx.android.synthetic.main.activity_favorites.*
 
 class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
@@ -109,17 +109,17 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     }
 
     override fun resume(fl: Float) {
-        bottom_pause_or_play.status=PlayPauseIcon.PlayStatus.Playing
+        bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Playing
         bottom_pause_or_play.progressPercent=fl
     }
 
     override fun pause() {
         animator?.cancel()
-        bottom_pause_or_play.status=PlayPauseIcon.PlayStatus.Pausing
+        bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Pausing
     }
 
     override fun preparing() {
-        bottom_pause_or_play.status=PlayPauseIcon.PlayStatus.Loading
+        bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Loading
         animator=ObjectAnimator.ofFloat(bottom_pause_or_play,"angle",0f,360f)
         animator?.apply {
             duration=1000
@@ -129,7 +129,7 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     }
 
     override fun start() {
-        bottom_pause_or_play.status=PlayPauseIcon.PlayStatus.Playing
+        bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Playing
     }
 
     //当view刚刚开启 绑定一下service
@@ -167,7 +167,7 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
                 pause()
             }
             bottom_song_name.text=songName
-            Glide.with(this).load(imageUrl).into(bottom_song_image)
+            Glide.with(this).load(imageUrl).circleCrop().into(bottom_song_image)
     }
 
     override fun sendToast(s: String) {

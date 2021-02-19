@@ -9,12 +9,10 @@ import android.view.View
 import android.widget.SeekBar
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.songs.Song
-import com.example.neteasecloudmusic.favoriteslist.songs.Songs
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
-import com.example.neteasecloudmusic.view.PlayPauseIcon
+import com.example.neteasecloudmusic.view.PlayPauseBar
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_song_ui.*
 import kotlinx.coroutines.*
 
 var songJob= Job()
@@ -24,7 +22,7 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         ,SeekBar.OnSeekBarChangeListener
         ,ServiceConnection
         ,View.OnClickListener, IServiceBindPresenter
-,PlayPauseIcon.Click{
+,PlayPauseBar.Click{
     val TAG="SongPresenter"
     var view=activity
     var model=SongModel()
@@ -256,11 +254,11 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
     }
 
     override fun onPlayPauseViewClick(v: View) {
-        val view=v as PlayPauseIcon
-        if (view.status== PlayPauseIcon.PlayStatus.Pausing){
+        val view=v as PlayPauseBar
+        if (view.status== PlayPauseBar.PlayStatus.Pausing){
             musicService.pauseToStart()
             this.view.resume(getCurrentPosition().toFloat()/ getDuration())
-        }else if (view.status== PlayPauseIcon.PlayStatus.Playing){
+        }else if (view.status== PlayPauseBar.PlayStatus.Playing){
             musicService.pauseMusic()
             this.view.iconChangeToPause()
         }

@@ -9,7 +9,7 @@ import android.view.View
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendPostRequest
-import com.example.neteasecloudmusic.view.PlayPauseIcon
+import com.example.neteasecloudmusic.view.PlayPauseBar
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
-,ServiceConnection, IServiceBindPresenter,PlayPauseIcon.Click {
+,ServiceConnection, IServiceBindPresenter,PlayPauseBar.Click {
     val model =SearchModel()
 
     val TAG="SearchPresenter"
@@ -163,10 +163,10 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
     }
 
     override fun onPlayPauseViewClick(v: View) {
-        val view=v as PlayPauseIcon
-        if (view.status==PlayPauseIcon.PlayStatus.Pausing){
+        val view=v as PlayPauseBar
+        if (view.status==PlayPauseBar.PlayStatus.Pausing){
             this.view.resume(getCurrentPosition().toFloat()/ getDuration())
-        }else if (view.status==PlayPauseIcon.PlayStatus.Playing){
+        }else if (view.status==PlayPauseBar.PlayStatus.Playing){
             this.view.iconChangeToPause()
         }
     }

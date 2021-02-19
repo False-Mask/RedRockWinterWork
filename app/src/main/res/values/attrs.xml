@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="PlayPauseIcon">
+    自定义的播放暂停键有进度显示
+    <declare-styleable name="PlayPauseBar">
 
         <!--        加载完成或者还没加载的歌曲属性-->
         <attr name="outer_circle_size" format="dimension"/>
@@ -25,4 +26,19 @@
 
 
     </declare-styleable>
+
+    <declare-styleable name="NextSongIcon">
+        <attr name="press_color" format="color"/>
+        <attr name="normal_color" format="color"/>
+        <attr name="direction_right" format="boolean"/>
+    </declare-styleable>
+
+
+<!--    自定义的播放暂停按钮 (没有进度显示)-->
+    <declare-styleable name="PlayPauseIcon">
+        <attr name="press_color"/>
+        <attr name="normal_color"/>
+        <attr name="loading_circle_color"/>
+    </declare-styleable>
+
 </resources>

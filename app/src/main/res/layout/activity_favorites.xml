@@ -71,7 +71,7 @@
             app:layout_constraintStart_toStartOf="@+id/guideline13"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.example.neteasecloudmusic.view.PlayPauseIcon
+        <com.example.neteasecloudmusic.view.PlayPauseBar
             android:id="@+id/bottom_pause_or_play"
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -11,7 +11,6 @@ import android.widget.Toast
 import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.MyApplication
 import com.example.neteasecloudmusic.R
-import com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner.LocalBannerData
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.ByPhoneModel
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.loginResult
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
@@ -26,9 +25,9 @@ import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.recyclerview.favorites.Favorites
 import com.example.neteasecloudmusic.recyclerview.favorites.list
 import com.example.neteasecloudmusic.userfragmentmvp.rvAdapter
-import com.example.neteasecloudmusic.view.PlayPauseIcon
+import com.example.neteasecloudmusic.view.NextLastSongIcon
+import com.example.neteasecloudmusic.view.PlayPauseBar
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -44,7 +43,7 @@ const val BannerDataObjectName="BannerData"
 const val BaseBannerImageFileName="banner"
 class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainActivityPresenter
         , IServiceBindPresenter,ServiceConnection
-        ,View.OnClickListener, PlayPauseIcon.Click {
+        ,View.OnClickListener, PlayPauseBar.Click, NextLastSongIcon.Click {
 
     val TAG = "MainActivityPresenter"
     var view = activity
@@ -209,17 +208,29 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
     }
 
     override fun onPlayPauseViewClick(v: View) {
-        val v2=v as PlayPauseIcon
+        val v2=v as PlayPauseBar
         when(v2.status){
-            PlayPauseIcon.PlayStatus.Playing->{
+            PlayPauseBar.PlayStatus.Playing->{
                 musicService.pauseMusic()
                 onPause()
             }
-            PlayPauseIcon.PlayStatus.Pausing->{
+            PlayPauseBar.PlayStatus.Pausing->{
                 musicService.pauseToStart()
                 onResume()
             }else->{
 
+            }
+        }
+    }
+
+    override fun onIconClicked(v: View) {
+        when(v.id){
+            R.id.bottom_next_song->{
+                musicService.playNextSong()
+            }
+
+            R.id.bottom_last_song->{
+                musicService.playLastSong()
             }
         }
     }

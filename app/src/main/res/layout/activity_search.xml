@@ -125,11 +125,10 @@
             app:layout_constraintGuide_percent="0.8686131" />
 
 
-        <com.example.neteasecloudmusic.view.PlayPauseIcon
+        <com.example.neteasecloudmusic.view.PlayPauseBar
             android:id="@+id/search_play_or_pause"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#433E3E"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline52"
             app:layout_constraintStart_toStartOf="@+id/guideline55"

@@ -14,7 +14,6 @@ import com.example.neteasecloudmusic.favoriteslist.songs.SongTitle
 import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
 import com.example.neteasecloudmusic.mainactivitymvp.mainActivitySp
 import com.example.neteasecloudmusic.mainactivitymvp.playListResult
-import com.example.neteasecloudmusic.mytools.changeDipIntoFloat
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadObjectFile
 import com.example.neteasecloudmusic.mytools.filedownload.imagePath
@@ -23,11 +22,10 @@ import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
-import com.example.neteasecloudmusic.view.PlayPauseIcon
+import com.example.neteasecloudmusic.view.PlayPauseBar
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -39,7 +37,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
 ,ServiceConnection
 ,IServiceBindPresenter
 ,View.OnClickListener
-,PlayPauseIcon.Click{
+,PlayPauseBar.Click{
     val TAG = "FavoritesPresenter"
 
     //获取song的详细信息
@@ -475,11 +473,11 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
     }
 
     override fun onPlayPauseViewClick(v: View) {
-        var v2=v as PlayPauseIcon
-        if (v2.status==PlayPauseIcon.PlayStatus.Playing){
+        var v2=v as PlayPauseBar
+        if (v2.status==PlayPauseBar.PlayStatus.Playing){
             musicService.pauseMusic()
             onPause()
-        }else if(v2.status==PlayPauseIcon.PlayStatus.Pausing){
+        }else if(v2.status==PlayPauseBar.PlayStatus.Pausing){
             musicService.pauseToStart()
             onResume()
         }

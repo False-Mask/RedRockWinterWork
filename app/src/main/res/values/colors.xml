@@ -25,4 +25,7 @@
     <color name="default_play_bar_color">#000000</color>
     <color name="default_pause_icon_color">#000000</color>
     <color name="default_play_icon_color">#000000</color>
+
+    <color name="default_pressed_color">#585eaa</color>
+    <color name="default_normal_color"> #000000</color>
 </resources>

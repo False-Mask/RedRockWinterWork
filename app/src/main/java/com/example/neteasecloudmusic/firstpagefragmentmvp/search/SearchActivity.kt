@@ -19,7 +19,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
-import com.example.neteasecloudmusic.view.PlayPauseIcon
+import com.example.neteasecloudmusic.view.PlayPauseBar
 import kotlinx.android.synthetic.main.activity_search.*
 
 class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBindView{
@@ -87,14 +87,14 @@ override fun onPause() {
             Glide.with(this).load(imageUrl).apply(RequestOptions.bitmapTransform(CircleCrop())).into(search_song_image)
         search_song_text.text=songName
         val status=search_play_or_pause.status
-        if (status==PlayPauseIcon.PlayStatus.Playing){
+        if (status==PlayPauseBar.PlayStatus.Playing){
             if (getCurrentPosition()<=0){
                 start()
             }else{
                 resume(currentTime.toFloat()/duration)
             }
 
-        }else if (status==PlayPauseIcon.PlayStatus.Pausing){
+        }else if (status==PlayPauseBar.PlayStatus.Pausing){
             iconChangeToPause()
         }
     }
@@ -108,7 +108,7 @@ override fun onPause() {
     }
 
     override fun iconChangeToPause() {
-        search_play_or_pause.status=PlayPauseIcon.PlayStatus.Pausing
+        search_play_or_pause.status=PlayPauseBar.PlayStatus.Pausing
     }
 
     override fun setBufferedProgress(percent: Int) {
@@ -116,12 +116,12 @@ override fun onPause() {
     }
 
     override fun resume(percent: Float) {
-        search_play_or_pause.status=PlayPauseIcon.PlayStatus.Playing
+        search_play_or_pause.status=PlayPauseBar.PlayStatus.Playing
         search_play_or_pause.progressPercent=percent
     }
 
     override fun loading() {
-        search_play_or_pause.status=PlayPauseIcon.PlayStatus.Loading
+        search_play_or_pause.status=PlayPauseBar.PlayStatus.Loading
         animator=ObjectAnimator.ofFloat(search_play_or_pause,"angle",0f,360f)
         animator?.duration=1000
         animator?.repeatCount=-1
@@ -131,6 +131,6 @@ override fun onPause() {
 
     override fun start() {
         animator?.cancel()
-        search_play_or_pause.status=PlayPauseIcon.PlayStatus.Playing
+        search_play_or_pause.status=PlayPauseBar.PlayStatus.Playing
     }
 }

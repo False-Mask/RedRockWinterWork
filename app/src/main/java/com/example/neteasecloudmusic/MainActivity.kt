@@ -13,6 +13,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
 import com.example.neteasecloudmusic.firstpagefragmentmvp.FirstFragment
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
@@ -21,8 +23,7 @@ import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netJob
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.userfragmentmvp.UserFragment
-import com.example.neteasecloudmusic.view.PlayPauseIcon
-import kotlinx.android.synthetic.main.activity_favorites.*
+import com.example.neteasecloudmusic.view.PlayPauseBar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.user_text as user_text1
 
@@ -30,6 +31,7 @@ import kotlinx.android.synthetic.main.activity_main.user_text as user_text1
 var context:MainActivity?=null
 class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIView
         ,NetWorkChangeImp.NetCallback, IServiceBindView {
+
     //网络连接管理器
     private lateinit var connectivityManager:ConnectivityManager
     //连接变化的实现类
@@ -70,10 +72,12 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
 
     private fun initClick() {
         bottom_play_pause_main.addOnViewClickListener(presenter)
+
         bottom_song_image_main.setOnClickListener(presenter)
         bottom_song_name_main.setOnClickListener(presenter)
-        bottom_next_song.setOnClickListener(presenter)
-        bottom_last_song.setOnClickListener(presenter)
+
+        bottom_next_song.addOnIconClickListener(presenter)
+        bottom_last_song.addOnIconClickListener(presenter)
     }
 
     //activity销毁的时候取消job以免发生内存泄漏
@@ -157,17 +161,17 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     }
 
     override fun resume(fl: Float) {
-        bottom_play_pause_main.status=PlayPauseIcon.PlayStatus.Playing
+        bottom_play_pause_main.status=PlayPauseBar.PlayStatus.Playing
         bottom_play_pause_main.progressPercent=fl
     }
 
     override fun pause() {
         animator?.cancel()
-        bottom_play_pause_main.status=PlayPauseIcon.PlayStatus.Pausing
+        bottom_play_pause_main.status=PlayPauseBar.PlayStatus.Pausing
     }
 
     override fun preparing() {
-        bottom_play_pause_main.status=PlayPauseIcon.PlayStatus.Loading
+        bottom_play_pause_main.status=PlayPauseBar.PlayStatus.Loading
         animator?.apply {
             duration=1000
             repeatCount=-1
@@ -176,7 +180,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     }
 
     override fun start() {
-        bottom_play_pause_main.status=PlayPauseIcon.PlayStatus.Playing
+        bottom_play_pause_main.status=PlayPauseBar.PlayStatus.Playing
     }
 
 
@@ -208,6 +212,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         reMoveView(this)
     }
 
+    var circleCrop=RequestOptions.bitmapTransform(CircleCrop())
     //service的接口
     override fun serviceRefresh(songName: String, singer: String, imageUrl: String, duration: Int, currentTime: Int, songId: String) {
         if (getIsPlaying()){
@@ -215,7 +220,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         }else{
             pause()
         }
-        Glide.with(this).load(imageUrl).into(bottom_song_image_main)
+        Glide.with(this).load(imageUrl).circleCrop().into(bottom_song_image_main)
         bottom_song_name_main.text=songName
     }
 
