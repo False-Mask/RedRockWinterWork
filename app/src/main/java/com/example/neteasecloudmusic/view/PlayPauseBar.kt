@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.example.neteasecloudmusic.R
+import com.example.neteasecloudmusic.mytools.filedownload.filesPath
 import kotlin.math.sqrt
 
 class PlayPauseBar @JvmOverloads constructor(
@@ -34,11 +35,18 @@ class PlayPauseBar @JvmOverloads constructor(
     var centerY=0f
 
     //loading的时候的旋转角度
-    var angle=0f
+    private var angle=0f
+    set(value) {
+        invalidate()
+        field=value
+    }
 
     //播放的进度条的百分比
     var progressPercent=0f
-
+    set(value) {
+        invalidate()
+        field=value
+    }
 
 ///////////////////////////////
     //获取外部圆形的大小 默认2dp
@@ -165,9 +173,7 @@ class PlayPauseBar @JvmOverloads constructor(
 
             }
         }
-
-
-        invalidate()
+        // invalidate()
     }
 
     //绘制正在播放时候的进度条
@@ -241,12 +247,14 @@ class PlayPauseBar @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when(event?.action){
             MotionEvent.ACTION_DOWN->{
-
+                invalidate()
             }
             MotionEvent.ACTION_UP->{
                 if(event.x>=0 && event.x<=width && event.y>=0 && event.y<=height){
                     click?.onPlayPauseViewClick(this)
+
                 }
+                invalidate()
             }
             MotionEvent.ACTION_MOVE->{
 
@@ -271,4 +279,8 @@ class PlayPauseBar @JvmOverloads constructor(
    enum class PlayStatus {
         Idle,Loading,Playing,Pausing
    }
+
+    fun doInvalidate(){
+        invalidate()
+    }
 }

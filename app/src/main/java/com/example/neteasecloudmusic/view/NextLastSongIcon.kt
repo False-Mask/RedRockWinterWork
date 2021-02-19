@@ -110,7 +110,7 @@ class NextLastSongIcon @JvmOverloads constructor(
         path.close()
         canvas?.drawPath(path,paint)
         canvas?.drawLine((centerX+r/2.0).toFloat(),(centerY- sqrt(3f) /3.0*r).toFloat(),(centerX+r/2.0).toFloat(),(centerY+ sqrt(3f) /3.0*r).toFloat(),paint)
-        invalidate()
+        //invalidate()
 
     }
 
@@ -177,17 +177,24 @@ class NextLastSongIcon @JvmOverloads constructor(
                 drawType = DrawType.Normal
                 if (event.x>= 0 && event.x<=width && event.y >=0 && event.y<= height){
                     click?.onIconClicked(this)
+
                 }
+                invalidate()
                 //Log.e("TAG", "up" )
             }
 
             MotionEvent.ACTION_DOWN -> {
                 drawType = DrawType.Pressed
+                invalidate()
                 //Log.e("TAG", "down")
             }
 
         }
         return true
+    }
+
+    fun doInvalidate(){
+        invalidate()
     }
 
 
@@ -206,6 +213,5 @@ class NextLastSongIcon @JvmOverloads constructor(
     interface Click{
         fun onIconClicked(v:View)
     }
-
 
 }

@@ -83,13 +83,15 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     //图标由pause状态改为play
     override fun iconChangeToPlay() {
         play_pause_icon.status=PlayPauseBar.PlayStatus.Playing
-        //play_pause_icon.setImageResource(R.drawable.play)
+        play_pause_icon.invalidate()
+    //play_pause_icon.setImageResource(R.drawable.play)
     }
 
     //图标由play改为pause
     override fun iconChangeToPause() {
         play_pause_icon.status=PlayPauseBar.PlayStatus.Pausing
-        //play_pause_icon.setImageResource(R.drawable.pause)
+        play_pause_icon.invalidate()
+    //play_pause_icon.setImageResource(R.drawable.pause)
     }
     //暂时放弃
     override fun setBufferedProgress(percent: Int) {}
@@ -143,6 +145,9 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
         song_ui_seek_bar.max=duration
         total_song_progress.text= changMsIntoMinutesAndSecond(duration)
         current_song_progress.text= changMsIntoMinutesAndSecond(currentTime)
+
+        play_pause_icon.invalidate()
+
         if(getIsPlaying()){
 
             play_pause_icon.status=PlayPauseBar.PlayStatus.Playing

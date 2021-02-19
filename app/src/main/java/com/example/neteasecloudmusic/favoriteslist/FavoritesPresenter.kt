@@ -473,7 +473,7 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
     }
 
     override fun onPlayPauseViewClick(v: View) {
-        var v2=v as PlayPauseBar
+        val v2=v as PlayPauseBar
         if (v2.status==PlayPauseBar.PlayStatus.Playing){
             musicService.pauseMusic()
             onPause()

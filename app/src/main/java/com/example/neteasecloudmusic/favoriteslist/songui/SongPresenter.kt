@@ -259,6 +259,7 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         val view=v as PlayPauseBar
         if (view.status== PlayPauseBar.PlayStatus.Pausing){
             musicService.pauseToStart()
+            this.view.iconChangeToPlay()
             this.view.resume(getCurrentPosition().toFloat()/ getDuration())
         }else if (view.status== PlayPauseBar.PlayStatus.Playing){
             musicService.pauseMusic()

@@ -320,6 +320,7 @@ class FragmentPresenter(firstFragment: FirstFragment) :FirstFragmentContract.Fir
 
     override fun onRefresh() {
         if (preparedList.size==0&&preparingList.size==0){
+            initRecyclerView()
             view.sendToast("正在解析数据请稍后")
             view.setFreshOff()
         }else{
