@@ -1,11 +1,14 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp.search
 
 import android.animation.ObjectAnimator
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
+import android.transition.Explode
+import android.view.View
 import android.view.animation.LinearInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -17,6 +20,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.R
+import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
+import com.example.neteasecloudmusic.mytools.animation.createRotate
+import com.example.neteasecloudmusic.mytools.animation.pauseRotate
+import com.example.neteasecloudmusic.mytools.animation.startRotate
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.view.PlayPauseBar
@@ -34,6 +41,10 @@ class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBi
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //window.enterTransition=Explode()
+        //window.exitTransition=Explode()
+
         setContentView(R.layout.activity_search)
 
         search_play_or_pause.addOnViewClickListener(presenter)
@@ -57,6 +68,9 @@ class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBi
         search_rv.adapter= mAdapter
         search_rv.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
 
+        search_bottom_layout.setOnClickListener(presenter)
+
+
         presenter.addAdapter(mAdapter)
 
         button_1.setOnClickListener{
@@ -67,6 +81,14 @@ class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBi
         }
 
 
+        if(getIsPlaying()){
+            search_play_or_pause.status=PlayPauseBar.PlayStatus.Playing
+        }
+
+
+        createRotate(search_song_image)
+        if (getIsPlaying()) startRotate()
+        else pauseRotate()
     }
 
 //断开连接
@@ -83,6 +105,10 @@ override fun onPause() {
         addPresenter(presenter)
         val intent=Intent(this,MyMusicService::class.java)
         bindService(intent,connection, Context.BIND_AUTO_CREATE)
+
+        createRotate(search_song_image)
+        if (getIsPlaying()) startRotate()
+        else pauseRotate()
     }
 
 
@@ -146,5 +172,10 @@ override fun onPause() {
     override fun start() {
         animator?.cancel()
         search_play_or_pause.status=PlayPauseBar.PlayStatus.Playing
+    }
+
+    override fun loopToSongActivity(v: View?) {
+        val intent=Intent(this,SongUiActivity::class.java)
+        startActivity(intent,ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
     }
 }

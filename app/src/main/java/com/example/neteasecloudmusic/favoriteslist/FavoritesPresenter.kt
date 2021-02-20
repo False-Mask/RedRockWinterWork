@@ -14,6 +14,8 @@ import com.example.neteasecloudmusic.favoriteslist.songs.SongTitle
 import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
 import com.example.neteasecloudmusic.mainactivitymvp.mainActivitySp
 import com.example.neteasecloudmusic.mainactivitymvp.playListResult
+import com.example.neteasecloudmusic.mytools.animation.pauseRotate
+import com.example.neteasecloudmusic.mytools.animation.startRotate
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadObjectFile
 import com.example.neteasecloudmusic.mytools.filedownload.imagePath
@@ -365,6 +367,8 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                 //播放的同一首暂停
                 if (clickId== getMySongId()){
                     musicService.pauseMusic()
+                    //暂停播放
+                    pauseRotate()
                     this.view.iconChangeToPause()
                 }
                 //否者重新播放
@@ -379,10 +383,12 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                 //播放后暂停
                 if (getCurrentPosition()>0){
                     musicService.pauseToStart()
+                    startRotate()
                 }
                 //单纯的没播放 那就开始播放
                 else{
                     musicService.playMusic(listSong,position-1)
+                    startRotate()
                 }
             }
         }
@@ -480,9 +486,14 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
         val v2=v as PlayPauseBar
         if (v2.status==PlayPauseBar.PlayStatus.Playing){
             musicService.pauseMusic()
+            //停止rotate
+            pauseRotate()
             onPause()
         }else if(v2.status==PlayPauseBar.PlayStatus.Pausing){
             musicService.pauseToStart()
+            //开始rotate
+            startRotate()
+
             onResume()
         }
     }

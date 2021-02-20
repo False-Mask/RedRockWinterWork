@@ -89,7 +89,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:gravity="center_vertical"
-            android:text="TextView"
+            android:text="@string/default_bottom_text_context_main"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline39"
             app:layout_constraintStart_toStartOf="@+id/guideline32"

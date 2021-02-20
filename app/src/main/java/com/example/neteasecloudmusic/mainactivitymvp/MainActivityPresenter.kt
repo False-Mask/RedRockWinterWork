@@ -7,12 +7,15 @@ import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import com.example.neteasecloudmusic.MainActivity
 import com.example.neteasecloudmusic.MyApplication
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.ByPhoneModel
 import com.example.neteasecloudmusic.loginactivity.loginbyphone.loginResult
+import com.example.neteasecloudmusic.mytools.animation.pauseRotate
+import com.example.neteasecloudmusic.mytools.animation.startRotate
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadImage
 import com.example.neteasecloudmusic.mytools.filedownload.downLoadObjectFile
 import com.example.neteasecloudmusic.mytools.filedownload.imagePath
@@ -212,10 +215,14 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
         when(v2.status){
             PlayPauseBar.PlayStatus.Playing->{
                 musicService.pauseMusic()
+                //停止动画
+                pauseRotate()
                 onPause()
             }
             PlayPauseBar.PlayStatus.Pausing->{
                 musicService.pauseToStart()
+                //继续动画
+                startRotate()
                 onResume()
             }else->{
 
@@ -234,4 +241,14 @@ class MainActivityPresenter (activity:MainActivity): MainActivityContract.MainAc
             }
         }
     }
+
+//    fun loading(image_view: ImageView) {
+//        netThread.launch (IO){
+//            delay(3000)
+//            withContext(Main){
+//                image_view.visibility=View.GONE
+//            }
+//
+//        }
+//    }
 }

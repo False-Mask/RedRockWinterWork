@@ -1,6 +1,7 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp.search
 
 import android.content.ComponentName
+import android.content.Intent
 import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.os.IBinder
@@ -10,6 +11,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
+import com.example.neteasecloudmusic.mytools.animation.pauseRotate
+import com.example.neteasecloudmusic.mytools.animation.startRotate
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendPostRequest
@@ -25,7 +28,7 @@ import java.lang.Exception
 import java.security.Key
 
 class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
-,ServiceConnection, IServiceBindPresenter,PlayPauseBar.Click, TextView.OnEditorActionListener, View.OnKeyListener {
+,ServiceConnection, IServiceBindPresenter,PlayPauseBar.Click, TextView.OnEditorActionListener, View.OnKeyListener, View.OnClickListener {
     private lateinit var mAdapter: SearchRvAdapter
     private val model =SearchModel()
     companion object{
@@ -58,6 +61,7 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
                 //之前没有播放过
                 if (getCurrentPosition() <= 0) {
                     musicService?.playMusic(searchSong, position)
+                    startRotate()
                     view.resume(0f)
                 }
                 //之前播放过
@@ -88,7 +92,7 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
 
         })
 
-        //开线程搜索
+        //开协程搜索
         netThread.launch (IO){
 
             val (url,tail) = model.getSearchUrlTail(keyboard)
@@ -182,10 +186,12 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
         val view=v as PlayPauseBar
         if (view.status==PlayPauseBar.PlayStatus.Pausing){
             musicService?.pauseToStart()
+            startRotate()
             this.view.resume(getCurrentPosition().toFloat()/ getDuration())
         }else if (view.status==PlayPauseBar.PlayStatus.Playing){
             this.view.iconChangeToPause()
             musicService?.pauseMusic()
+            pauseRotate()
         }
     }
 
@@ -205,6 +211,10 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
 
     fun addAdapter(mAdapter: SearchRvAdapter) {
         this.mAdapter=mAdapter
+    }
+
+    override fun onClick(v: View?) {
+        view.loopToSongActivity(v)
     }
 
 }

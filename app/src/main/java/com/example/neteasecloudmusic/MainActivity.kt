@@ -22,6 +22,10 @@ import com.example.neteasecloudmusic.favoriteslist.songui.SongUiActivity
 import com.example.neteasecloudmusic.firstpagefragmentmvp.FirstFragment
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityContract
 import com.example.neteasecloudmusic.mainactivitymvp.MainActivityPresenter
+import com.example.neteasecloudmusic.mytools.animation.createRotate
+import com.example.neteasecloudmusic.mytools.animation.pauseRotate
+import com.example.neteasecloudmusic.mytools.animation.removeRotate
+import com.example.neteasecloudmusic.mytools.animation.startRotate
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netJob
 import com.example.neteasecloudmusic.mytools.toast.MyToast
@@ -63,9 +67,14 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor=resources.getColor(R.color.status_bar_color)
 
+
         setContentView(R.layout.activity_main)
         //初始化connection和presenter
         presenter=MainActivityPresenter(this)
+
+//        presenter.loading(image_view)
+
+
         connection= presenter
         //程序开始 初始化View视图
         initFragment()
@@ -76,6 +85,8 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         //添加监听器
         NetWorkChangeImp.addListener(this)
         context=this
+
+        createRotate(bottom_song_image_main)
     }
 
     private fun initClick() {
@@ -86,12 +97,16 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
 
         bottom_next_song.addOnIconClickListener(presenter)
         bottom_last_song.addOnIconClickListener(presenter)
+
     }
 
     //activity销毁的时候取消job以免发生内存泄漏
     //同时撤回网络状态的监听(为系统减负)
     override fun onDestroy() {
         super.onDestroy()
+        //移除旋转
+        removeRotate(bottom_song_image_main)
+
         connectivityManager.unregisterNetworkCallback(myListener)
         netJob.cancel()
 
@@ -151,6 +166,9 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         }
         //提交
         transaction.commit()
+        //初始化转动
+        if (getIsPlaying()) startRotate()
+        else pauseRotate()
     }
     //初始化Fragment
     override fun initFragment() {
@@ -223,6 +241,10 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
             Log.e(TAG, "绑定服务故障",e )
         }
 
+        createRotate(bottom_song_image_main)
+        if (getIsPlaying()) startRotate()
+        else pauseRotate()
+
         addView(this)
         addPresenter(presenter)
     }
@@ -281,4 +303,6 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         MyToast().sendToast(this,"网络出了亿点小问题~",Toast.LENGTH_SHORT)
         presenter.onUnavailable()
     }
+
+
 }

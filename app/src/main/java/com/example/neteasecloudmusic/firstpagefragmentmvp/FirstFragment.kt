@@ -1,5 +1,7 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp
 
+import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -126,5 +128,6 @@ class FirstFragment(mainActivity: MainActivity) : Fragment(),FirstFragmentContra
     override fun loopToSearchActivity() {
         val intent=Intent(mContext,SearchActivity::class.java)
         startActivity(intent)
+        //,ActivityOptions.makeSceneTransitionAnimation(mContext).toBundle()
     }
 }

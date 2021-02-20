@@ -1,6 +1,7 @@
 package com.example.neteasecloudmusic.favoriteslist
 
 import android.animation.ObjectAnimator
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
@@ -9,6 +10,7 @@ import android.transition.Explode
 import android.transition.Fade
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.LinearInterpolator
 import android.widget.TextView
 import android.widget.Toast
@@ -17,6 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.favoriteslist.songs.SongRvAdapter
+import com.example.neteasecloudmusic.mytools.animation.createRotate
+import com.example.neteasecloudmusic.mytools.animation.pauseRotate
+import com.example.neteasecloudmusic.mytools.animation.removeRotate
+import com.example.neteasecloudmusic.mytools.animation.startRotate
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.view.PlayPauseBar
@@ -46,14 +52,23 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //设置window的内容
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor=resources.getColor(R.color.status_bar_color)
+
         window.enterTransition=Explode()
         window.exitTransition=Explode()
 
         setContentView(R.layout.activity_favorites)
+
+        createRotate(bottom_song_image)
+        if (getIsPlaying()){
+            startRotate()
+        }
+
         //初始化
         //发送网络请求啥的啊(获取点击的position)
         val position=intent.extras?.getInt("position")
-
 
 //
 //        val isSendUserId=intent.extras?.getBoolean("is_send_user_id")?:false
@@ -115,13 +130,14 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     }
 
     override fun loopToSongUi(intent: Intent) {
-        startActivity(intent)
+        startActivity(intent,ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
     }
 
     override fun resume(fl: Float) {
         bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Playing
         bottom_pause_or_play.invalidate()
         bottom_pause_or_play.progressPercent=fl
+        start()
     }
 
     override fun pause() {
@@ -153,6 +169,12 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         val intent=Intent(this,MyMusicService::class.java)
         Log.e(TAG, "开始连接" )
         bindService(intent,connection,Context.BIND_AUTO_CREATE)
+
+        //创建绑定初始化
+        createRotate(bottom_song_image)
+        if (getIsPlaying()){
+            startRotate()
+        }
     }
 
     //视图不可见接触绑定 同时其他的view绑定了当前的service
@@ -171,6 +193,11 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         reMoveView(this)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        //移除动画
+        removeRotate(bottom_song_image)
+    }
 
     //service的同步view的播放进度的方法
     override fun setMusicMaxProgress(duration: Int) {}
@@ -194,6 +221,6 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
 
     override fun iconChangeToPause(){
         bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Pausing
-        bottom_pause_or_play.doInvalidate()
+        bottom_pause_or_play.invalidate()
     }
 }

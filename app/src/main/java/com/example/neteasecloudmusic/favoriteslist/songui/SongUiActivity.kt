@@ -15,6 +15,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.R
+import com.example.neteasecloudmusic.mytools.animation.createRotate
+import com.example.neteasecloudmusic.mytools.animation.pauseRotate
+import com.example.neteasecloudmusic.mytools.animation.removeRotate
+import com.example.neteasecloudmusic.mytools.animation.startRotate
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.time.changMsIntoMinutesAndSecond
 import com.example.neteasecloudmusic.mytools.toast.MyToast
@@ -34,6 +38,7 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     //当前播放的歌单
     var songs:MutableList<ServiceSong>?=null
 
+
     //Music播放的连接
     private var connection=presenter as ServiceConnection
 
@@ -48,6 +53,12 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
         window.exitTransition=Slide()
         setContentView(R.layout.activity_song_ui)
 
+        //添加动画
+        createRotate(song_ui_song_image_view)
+        //初始化转盘
+        if (getIsPlaying()){
+            startRotate()
+        }
 
         try {
 //            //初始化值
@@ -93,13 +104,15 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     override fun iconChangeToPlay() {
         play_pause_icon.status=PlayPauseBar.PlayStatus.Playing
         play_pause_icon.invalidate()
-    //play_pause_icon.setImageResource(R.drawable.play)
+        startRotate()
+        //play_pause_icon.setImageResource(R.drawable.play)
     }
 
     //图标由play改为pause
     override fun iconChangeToPause() {
         play_pause_icon.status=PlayPauseBar.PlayStatus.Pausing
         play_pause_icon.invalidate()
+        pauseRotate()
     //play_pause_icon.setImageResource(R.drawable.pause)
     }
     //暂时放弃
@@ -148,7 +161,7 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     override fun serviceRefresh(songName: String, singer: String, imageurl: String, duration: Int, currentTime: Int, songId: String) {
         song_ui_seek_bar.progress=currentTime
         //加载圆形图片
-        Glide.with(this).load(imageurl)
+        Glide.with(this).load(imageurl).placeholder(R.drawable.music_place_holder)
                 .apply(RequestOptions.bitmapTransform(CircleCrop())).into(song_ui_song_image_view)
         song_ui_song_name.text=songName
         song_ui_singer_name.text=singer
@@ -184,5 +197,7 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
         reMoveView(this)
         reMovePre(presenter)
         unbindService(connection)
+        //移除动画
+        removeRotate(song_ui_song_image_view)
     }
 }

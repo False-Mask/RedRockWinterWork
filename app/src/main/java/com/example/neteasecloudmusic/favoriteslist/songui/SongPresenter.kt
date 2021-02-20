@@ -85,14 +85,14 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
 
     //根据songId播放音乐
     private fun playMusic(songId:String) {
-        var url=model.getUrl(songId)
+        val url=model.getUrl(songId)
         songThread.launch (Dispatchers.IO){
             //获取音乐的信息
-            var songUrl= getMusicUrl(url)
+            val songUrl= getMusicUrl(url)
             //播放网络url 3种情况的处理
             when(songUrl){
                 // 1 没有找到资源
-                "NULL"-> withContext(Dispatchers.Main){
+                "NULL"-> withContext(Dispatchers.Main) {
                     view.sendToast("未找到该资源")
                     //把图标变回来
                     view.iconChangeToPause()
@@ -344,20 +344,6 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
                     }
                 }
             }
-            R.id.the_next_song_icon->{
-                if (getSongList()!=null){
-                    musicService.playNextSong()
-                }else{
-                    view.sendToast("暂无音乐播放列表~")
-                }
-            }
-            R.id.the_last_song_icon->{
-                if (getSongList()!=null){
-                    musicService.playLastSong()
-                }else{
-                    view.sendToast("暂无音乐播放列表~")
-                }
-            }
 
         }
     }
@@ -368,14 +354,26 @@ class SongPresenter(activity:SongUiActivity):SongContract.SongIPresenter
         this.song=songPlayList[position]
     }
 
+    //但上一首或者下一首按钮被点击了
     override fun onIconClicked(v: View) {
         when(v.id){
             R.id.the_next_song_icon->{
-                musicService.playNextSong()
+                if (getSongList()!=null){
+                    musicService.playNextSong()
+                    //更新一下song
+                    this.song= getSong()?: ServiceSong()
+                }else{
+                    view.sendToast("暂无音乐播放列表~")
+                }
             }
-
             R.id.the_last_song_icon->{
-                musicService.playLastSong()
+                if (getSongList()!=null){
+                    musicService.playLastSong()
+                    //更新一下song
+                    this.song= getSong()?:ServiceSong()
+                }else{
+                    view.sendToast("暂无音乐播放列表~")
+                }
             }
         }
     }
