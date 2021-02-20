@@ -55,11 +55,10 @@ class BannerHolder(itemView: View) : Holder(itemView), ViewPager.OnPageChangeLis
             vPAdapter.setPagerList(pagerView)
             //提示vPAdapter改变布局
             vPAdapter.notifyDataSetChanged()
-
-            BannerTools.addPoints(pointGroup,imageList,data.size)
         }
-        //提示更换布局
+        BannerTools.addPoints(pointGroup,imageList,data.size)
         //自动轮播
+        BannerTools.cancelBanner()
         BannerTools.bannerAutomatic(viewPager,data)
     }
 

@@ -15,14 +15,21 @@ import kotlinx.coroutines.withContext
 
 object BannerTools {
     private var flag=false
-    private var isAddFirstTime=true
+
+    private var doBanner =true
+
+    fun cancelBanner(){
+        doBanner=false
+    }
+
     fun bannerAutomatic(viewPager: ViewPager?, data:MutableList<NetBannerData>) {
         if (!flag){
             //开始刷新以后不再允许刷新
             flag=true
             bannerThread.launch(Dispatchers.IO) {
                 var current=viewPager?.currentItem?:0
-                while (true){
+                doBanner=true
+                while (doBanner){
                     delay(3000)
                     current = if (current==data.size-1) 0 else current+1
                     withContext(Dispatchers.Main){
@@ -41,8 +48,10 @@ object BannerTools {
         imageList: MutableList<ImageView>,
         size: Int
     ) {
-        if (isAddFirstTime){
-            isAddFirstTime=false
+            if (imageList.isNotEmpty()){
+                imageList.clear()
+                pointGroup?.removeAllViews()
+            }
             for (i in 0 until size){
                 val image= ImageView(mContext)
                 image.setImageResource(R.drawable.point_false)
@@ -51,6 +60,5 @@ object BannerTools {
                 pointGroup?.addView(image)
                 imageList.add(image)
             }
-        }
     }
 }
