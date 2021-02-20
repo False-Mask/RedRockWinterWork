@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.util.Log
+import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -107,6 +108,7 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
         animator?.apply {
             duration=1000
             repeatCount=-1
+            interpolator=LinearInterpolator()
             start()
         }
     }

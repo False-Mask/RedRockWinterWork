@@ -9,6 +9,7 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
@@ -187,6 +188,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         animator?.apply {
             duration=1000
             repeatCount=-1
+            interpolator=LinearInterpolator()
             start()
         }
     }

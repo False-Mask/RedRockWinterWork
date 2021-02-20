@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.LinearInterpolator
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -125,6 +126,7 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         animator?.apply {
             duration=1000
             repeatCount=-1
+            interpolator=LinearInterpolator()
             start()
         }
     }

@@ -121,6 +121,7 @@ override fun onPause() {
 
     override fun iconChangeToPause() {
         search_play_or_pause.status=PlayPauseBar.PlayStatus.Pausing
+        search_play_or_pause.invalidate()
     }
 
     override fun setBufferedProgress(percent: Int) {
@@ -130,6 +131,7 @@ override fun onPause() {
     override fun resume(percent: Float) {
         search_play_or_pause.status=PlayPauseBar.PlayStatus.Playing
         search_play_or_pause.progressPercent=percent
+        search_play_or_pause.invalidate()
     }
 
     override fun loading() {

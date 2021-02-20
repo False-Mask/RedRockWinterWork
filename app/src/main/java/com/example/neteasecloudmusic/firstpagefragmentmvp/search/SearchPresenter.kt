@@ -174,9 +174,11 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
     override fun onPlayPauseViewClick(v: View) {
         val view=v as PlayPauseBar
         if (view.status==PlayPauseBar.PlayStatus.Pausing){
+            musicService?.pauseToStart()
             this.view.resume(getCurrentPosition().toFloat()/ getDuration())
         }else if (view.status==PlayPauseBar.PlayStatus.Playing){
             this.view.iconChangeToPause()
+            musicService?.pauseMusic()
         }
     }
 
