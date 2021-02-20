@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic
 import android.animation.ObjectAnimator
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
@@ -9,6 +10,7 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -57,6 +59,10 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //改变顶部状态栏的颜色
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor=resources.getColor(R.color.status_bar_color)
+
         setContentView(R.layout.activity_main)
         //初始化connection和presenter
         presenter=MainActivityPresenter(this)
@@ -170,7 +176,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
     //跳转至 songUiActivity
     override fun loopToSongUi() {
         val intent=Intent(this,SongUiActivity::class.java)
-        startActivity(intent)
+        startActivity(intent,ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
     }
 
     override fun resume(fl: Float) {

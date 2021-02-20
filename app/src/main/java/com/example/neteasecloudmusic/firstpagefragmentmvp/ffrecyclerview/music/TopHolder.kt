@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.music
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.view.View
 import android.widget.ImageView
@@ -36,7 +37,7 @@ class TopHolder(itemView: View) : Holder(itemView) {
             ///
             intent.putExtra("useLocalCathe",false)
 
-            context?.startActivity(intent)
+            context?.startActivity(intent,ActivityOptions.makeSceneTransitionAnimation(context).toBundle())
         }
     }
 

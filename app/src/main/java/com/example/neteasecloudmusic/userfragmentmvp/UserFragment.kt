@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.userfragmentmvp
 
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -42,7 +43,6 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView 
     //view被刚刚创建的时候
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view=inflater.inflate(R.layout.second_fragment_layout,container,false)
-
         Log.e(TAG, "onCreateView: ")
         return view
     }
@@ -94,7 +94,7 @@ class UserFragment(mactivity:MainActivity) : Fragment() ,UserContract.UserIView 
     override fun favoritesClicked(v: View, position: Int, intent: Intent) {
         //把当前歌单的图片和创建者的头像 名字给FavoritesActivity
         //intent.putExtra("creator_name", playListDetailsResult.playlist.creator.)
-        startActivity(intent)
+        startActivity(intent,ActivityOptions.makeSceneTransitionAnimation(com.example.neteasecloudmusic.context).toBundle())
     }
 
     //改变user的界面

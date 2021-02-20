@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.transition.Slide
 import android.util.Log
+import android.view.WindowManager
 import android.view.animation.LinearInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +38,14 @@ class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     private var connection=presenter as ServiceConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor=resources.getColor(R.color.status_bar_color)
+
         super.onCreate(savedInstanceState)
+        //进出场动画
+        window.enterTransition=Slide()
+        window.exitTransition=Slide()
         setContentView(R.layout.activity_song_ui)
 
 

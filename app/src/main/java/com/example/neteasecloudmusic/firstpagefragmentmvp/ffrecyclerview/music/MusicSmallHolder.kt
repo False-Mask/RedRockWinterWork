@@ -1,5 +1,6 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.music
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.view.View
 import android.widget.ImageView
@@ -32,7 +33,7 @@ class MusicSmallHolder(itemView: View) : Holder(itemView) {
         itemView.setOnClickListener{
             val intent=Intent(context,FavoritesActivity::class.java)
             intent?.putExtra("playListId",date.id)
-            context?.startActivity(intent)
+            context?.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(context).toBundle())
         }
     }
 

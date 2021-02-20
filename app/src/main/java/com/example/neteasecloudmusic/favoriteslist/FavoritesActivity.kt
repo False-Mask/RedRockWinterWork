@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.transition.Explode
+import android.transition.Fade
 import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -19,6 +21,7 @@ import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.view.PlayPauseBar
 import kotlinx.android.synthetic.main.activity_favorites.*
+import java.io.FileDescriptor
 import java.lang.Exception
 
 class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
@@ -42,10 +45,15 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.enterTransition=Explode()
+        window.exitTransition=Explode()
+
         setContentView(R.layout.activity_favorites)
         //初始化
         //发送网络请求啥的啊(获取点击的position)
         val position=intent.extras?.getInt("position")
+
 
 //
 //        val isSendUserId=intent.extras?.getBoolean("is_send_user_id")?:false
