@@ -1,4 +1,4 @@
-package com.example.neteasecloudmusic.mytools
+package com.example.neteasecloudmusic.mytools.dimention
 
 import android.util.TypedValue
 import com.example.neteasecloudmusic.mytools.filedownload.mContext

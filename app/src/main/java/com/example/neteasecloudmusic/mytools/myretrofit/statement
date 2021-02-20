@@ -1,2 +1,0 @@
-封装Retrofit
-但由于Retrofit中Gson解析不支持泛型封装失败
