@@ -17,6 +17,7 @@ import com.example.neteasecloudmusic.view.PlayPauseBar
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.internal.cache.DiskLruCache
@@ -42,37 +43,43 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
     ) {
 
         //添加播放
-        mAdapter.addItemClickListener(object : CallBack{
+        mAdapter.addItemClickListener(object : CallBack {
             override fun onItemClicked(v: View, position: Int) {
-                if (!getIsPlaying() && getCurrentPosition()<=0){
-                    musicService?.playMusic(searchSong,position)
-                }else if (getCurrentPosition()>0 && getIsPlaying()){
-                    musicService?.pauseMusic()
-                }else if (getCurrentPosition()>0 && !getIsPlaying()){
-                    musicService?.pauseToStart()
-                }
+//                if (!getIsPlaying() && getCurrentPosition() <= 0) {
+//                    musicService?.playMusic(searchSong, position)
+//                } else if (getCurrentPosition() > 0 && getIsPlaying()) {
+//                    musicService?.pauseMusic()
+//                    Log.e(TAG, "onItemClicked: pause")
+//                } else if (getCurrentPosition() > 0 && !getIsPlaying()) {
+//                    musicService?.pauseToStart()
+//                    Log.e(TAG, "onItemClicked: start" )
+//                }
 
                 //之前没有播放过
-                if (getCurrentPosition()<=0){
-                    musicService?.playMusic(searchSong,position)
+                if (getCurrentPosition() <= 0) {
+                    musicService?.playMusic(searchSong, position)
+                    view.resume(0f)
                 }
                 //之前播放过
-                else{
+                else {
                     //点击的是同一个
-                    if (getPosition()==position){
+                    if (getPosition() == position) {
                         //暂停了 继续播放
-                        if (!getIsPlaying()){
+                        if (!getIsPlaying()) {
                             musicService?.pauseToStart()
+                            view.resume(getCurrentPosition().toFloat()/ getDuration())
                         }
                         //暂停播放
-                        else{
+                        else {
                             musicService?.pauseMusic()
+                            view.iconChangeToPause()
                         }
                     }
                     //点击的不是同一首音乐
-                    else{
+                    else {
                         musicService?.resetMusic()
-                        musicService?.playMusic(searchSong,position)
+                        musicService?.playMusic(searchSong, position)
+                        view.resume(0f)
                     }
 
                 }

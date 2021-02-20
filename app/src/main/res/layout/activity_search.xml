@@ -117,7 +117,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline60"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline50"
-        app:srcCompat="@drawable/favorite_icon" />
+        app:srcCompat="@drawable/music_place_holder" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"

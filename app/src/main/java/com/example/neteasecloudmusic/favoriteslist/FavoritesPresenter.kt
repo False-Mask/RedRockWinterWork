@@ -24,6 +24,8 @@ import com.example.neteasecloudmusic.mytools.net.sendGetRequest
 import com.example.neteasecloudmusic.mytools.sharedpreferences.put
 import com.example.neteasecloudmusic.view.PlayPauseBar
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.activity_favorites.view.*
+import kotlinx.android.synthetic.main.activity_song_ui.view.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -363,11 +365,13 @@ class FavoritesPresenter(favoritesActivity: FavoritesActivity) :FavoritesContrac
                 //播放的同一首暂停
                 if (clickId== getMySongId()){
                     musicService.pauseMusic()
+                    this.view.iconChangeToPause()
                 }
                 //否者重新播放
                 else{
                     musicService.resetMusic()
                     musicService.playMusic(listSong,position-1)
+                    this.view.resume(getCurrentPosition().toFloat()/ getDuration())
                 }
             }
             //没有播放音乐

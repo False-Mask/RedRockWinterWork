@@ -1,18 +1,18 @@
 package com.example.neteasecloudmusic.firstpagefragmentmvp.ffrecyclerview.banner
 
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.viewpager.widget.ViewPager
 import com.example.neteasecloudmusic.R
 import com.example.neteasecloudmusic.firstpagefragmentmvp.bannerThread
-import com.example.neteasecloudmusic.mytools.changeDipIntoFloat
+import com.example.neteasecloudmusic.mytools.dimention.changeDipIntoFloat
 import com.example.neteasecloudmusic.mytools.filedownload.mContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 object BannerTools {
     private var flag=false
     private var isAddFirstTime=true

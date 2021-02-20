@@ -13,13 +13,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.example.neteasecloudmusic.R
-import com.example.neteasecloudmusic.mytools.changMsIntoMinutesAndSecond
 import com.example.neteasecloudmusic.mytools.musicservice.*
+import com.example.neteasecloudmusic.mytools.time.changMsIntoMinutesAndSecond
 import com.example.neteasecloudmusic.mytools.toast.MyToast
 import com.example.neteasecloudmusic.view.PlayPauseBar
 import kotlinx.android.synthetic.main.activity_song_ui.*
 import kotlinx.android.synthetic.main.rv_song_list_item.*
-import java.lang.Exception
 
 class SongUiActivity : AppCompatActivity(),SongContract.SongIView
     //绑定Service实现的接口

@@ -56,12 +56,12 @@ class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBi
 
         search_rv.adapter= mAdapter
         search_rv.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
+
         presenter.addAdapter(mAdapter)
-
-
 
         button_1.setOnClickListener{
             val keyboard=search_text_sa.text.toString()
+
 
             presenter.beginSearch(keyboard,mAdapter)
         }

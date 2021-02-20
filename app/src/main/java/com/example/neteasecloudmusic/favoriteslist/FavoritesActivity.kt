@@ -112,6 +112,7 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
 
     override fun resume(fl: Float) {
         bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Playing
+        bottom_pause_or_play.invalidate()
         bottom_pause_or_play.progressPercent=fl
     }
 
@@ -134,6 +135,7 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
     override fun start() {
         bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Playing
     }
+
 
     //当view刚刚开启 绑定一下service
     override fun onStart() {
@@ -182,5 +184,8 @@ class FavoritesActivity : AppCompatActivity(),FavoritesContract.FavoritesIView
         MyToast().sendToast(this,s,Toast.LENGTH_SHORT)
     }
 
-    override fun iconChangeToPause(){}
+    override fun iconChangeToPause(){
+        bottom_pause_or_play.status=PlayPauseBar.PlayStatus.Pausing
+        bottom_pause_or_play.doInvalidate()
+    }
 }

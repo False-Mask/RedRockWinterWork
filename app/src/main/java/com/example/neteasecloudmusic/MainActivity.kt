@@ -112,8 +112,8 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         //初始化颜色
         user_text1.setTextColor(Color.BLACK)
         music_text.setTextColor(Color.BLACK)
-        bottom_user.setImageResource(R.drawable.user_icon_1)
-        bottom_music.setImageResource(R.drawable.music_icon_1)
+        bottom_user.setImageResource(R.drawable.user_icon_2)
+        bottom_music.setImageResource(R.drawable.music_icon_2)
 
 
         val manager=supportFragmentManager
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
             R.id.user_text,R.id.bottom_user-> {
                 //图标和Fragment响应
                 user_text1.setTextColor(resources.getColor(R.color.bottom_text_color))
-                bottom_user.setImageResource(R.drawable.user_icon_2)
+                bottom_user.setImageResource(R.drawable.user_icon_1)
                 hideAll(transaction)
                 //替换FrameLayout内容
                 transaction.show(secondFragment)
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
             }
             //用户点击 “首页”  选项
             R.id.bottom_music,R.id.music_text->{
-                bottom_music.setImageResource(R.drawable.music_icon_2)
+                bottom_music.setImageResource(R.drawable.music_icon_1)
                 music_text.setTextColor(resources.getColor(R.color.bottom_text_color))
                 hideAll(transaction)
                 transaction.show(firstFragment)
@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() , MainActivityContract.MainActivityIVie
         hideAll(transaction)
         transaction.show(firstFragment)
         //底部导航栏初始化
-        bottom_music.setImageResource(R.drawable.music_icon_2)
+        bottom_music.setImageResource(R.drawable.music_icon_1)
         music_text.setTextColor(resources.getColor(R.color.bottom_text_color))
 
         //提交申请
