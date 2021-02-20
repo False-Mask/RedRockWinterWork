@@ -56,4 +56,5 @@
     <string name="defaul_recommond_song">推荐歌曲</string>
     <string name="default_search_bar_text">搜索</string>
     <string name="default_text_sa_hint">搜索</string>
+    <string name="default_search_button_text">搜索</string>
 </resources>

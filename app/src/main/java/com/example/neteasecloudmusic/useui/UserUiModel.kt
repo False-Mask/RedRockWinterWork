@@ -3,6 +3,7 @@ package com.example.neteasecloudmusic.useui
 import android.util.Log
 import com.example.neteasecloudmusic.mytools.net.SendNetRequest
 import com.google.gson.Gson
+import java.lang.Exception
 
 class UserUiModel :UserUiContract.UserUiIModel{
     val TAG="UserUiModel"
@@ -20,8 +21,11 @@ class UserUiModel :UserUiContract.UserUiIModel{
                 ,object : SendNetRequest.Back{
             override fun onResponded(resultBody: String) {
                 Log.d(TAG, "UserUiModel onResponded: ")
-                var gson = Gson()
-                detailResult = gson.fromJson(resultBody,DetailResult::class.java)
+                val gson = Gson()
+                try {
+                    detailResult = gson.fromJson(resultBody,DetailResult::class.java)
+                }catch (e:Exception){}
+
 
             }
 
@@ -47,7 +51,7 @@ class UserUiModel :UserUiContract.UserUiIModel{
         var baoyueVersion: Int = 0
         var createTime: Long = 0
         var donateVersion: Int = 0
-        var id: Int = 0
+        var id: Long = 0
         var paidFee: Boolean = false
         var status: Int = 0
         var tokenVersion: Int = 0

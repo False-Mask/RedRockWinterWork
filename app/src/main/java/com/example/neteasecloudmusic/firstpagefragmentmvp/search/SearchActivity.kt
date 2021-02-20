@@ -38,6 +38,10 @@ class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBi
 
         search_play_or_pause.addOnViewClickListener(presenter)
 
+        search_text_sa.setOnEditorActionListener(presenter)
+
+        search_text_sa.setOnKeyListener(presenter)
+
         search_text_sa.apply {
             isFocusable=true
             isFocusableInTouchMode=true
@@ -47,11 +51,17 @@ class SearchActivity : AppCompatActivity(),SearchContract.SearchIView,IServiceBi
             inputManager.showSoftInput(search_text_sa,0)
         }
 
+
         val mAdapter=SearchRvAdapter()
+
+        search_rv.adapter= mAdapter
+        search_rv.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
+        presenter.addAdapter(mAdapter)
+
+
+
         button_1.setOnClickListener{
             val keyboard=search_text_sa.text.toString()
-            search_rv.adapter= mAdapter
-            search_rv.layoutManager=LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
 
             presenter.beginSearch(keyboard,mAdapter)
         }

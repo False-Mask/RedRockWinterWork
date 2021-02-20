@@ -5,7 +5,11 @@ import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.TextView
 import com.example.neteasecloudmusic.mytools.musicservice.*
 import com.example.neteasecloudmusic.mytools.net.netThread
 import com.example.neteasecloudmusic.mytools.net.sendPostRequest
@@ -15,13 +19,18 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.cache.DiskLruCache
 import java.lang.Exception
+import java.security.Key
 
 class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
-,ServiceConnection, IServiceBindPresenter,PlayPauseBar.Click {
-    val model =SearchModel()
+,ServiceConnection, IServiceBindPresenter,PlayPauseBar.Click, TextView.OnEditorActionListener, View.OnKeyListener {
+    private lateinit var mAdapter: SearchRvAdapter
+    private val model =SearchModel()
+    companion object{
+        const val TAG="SearchPresenter"
+    }
 
-    val TAG="SearchPresenter"
     //开始寻找
     var musicService:MyMusicService?=null
     //
@@ -169,6 +178,24 @@ class SearchPresenter(var view:SearchActivity): SearchContract.SearchIPresenter
         }else if (view.status==PlayPauseBar.PlayStatus.Playing){
             this.view.iconChangeToPause()
         }
+    }
+
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (actionId==EditorInfo.IME_ACTION_SEARCH){
+            beginSearch(v?.text.toString(),mAdapter)
+        }
+        return true
+    }
+
+    override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode==KeyEvent.KEYCODE_ENTER && KeyEvent.ACTION_DOWN==event?.action){
+            beginSearch((v as EditText).text.toString(),mAdapter)
+        }
+        return false
+    }
+
+    fun addAdapter(mAdapter: SearchRvAdapter) {
+        this.mAdapter=mAdapter
     }
 
 }
