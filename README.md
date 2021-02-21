@@ -57,7 +57,7 @@ app选择的是网易云接口文档进行实现
 
 ## 	2.2自定义view
 
-​	![gif](https://github.com/False-Mask/RedRockWinterWork/tree/master/Pics/view.jpg)
+​	![gif](https://github.com/False-Mask/RedRockWinterWork/tree/master/Pics/view.gif)
 
 ​			我当时写了一个显示加载动画和播放进度 播放状态（暂停/播放）的  播放/暂停按钮  通过重写view的ondraw方法 由于view是动态			的  所以我先把静态的画了   然后再进行动态的绘制
 
